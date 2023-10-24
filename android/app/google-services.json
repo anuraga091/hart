@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "179444331073",
+    "project_id": "hart-dating-app",
+    "storage_bucket": "hart-dating-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179444331073:android:aeb7b8a714d274f99a0cc0",
+        "android_client_info": {
+          "package_name": "com.hart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "179444331073-0our82t9hhv234kb40e1gb5j81c27f3l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0qJk2sCvs406qG7A8kT8xKSiSmrE9i5k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "179444331073-0our82t9hhv234kb40e1gb5j81c27f3l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,14 +1,20 @@
 import { StyleSheet, View, Image, Text, Pressable } from "react-native";
 import React from 'react'
-import { Color, FontFamily } from '../GlobalStyles'
+import { Color, FontFamily } from '../GlobalStyles';import { NavigationContainer } from '@react-navigation/native';
 
-const IntroPage1 = () => {
+
+const IntroPage2 = ({navigation}) => {
+
+    const goToSignup = () => {
+        navigation.navigate('login')
+    }
+
   return (
-    <View style={styles.introPage1}>
+    <View style={styles.introPage2}>
         <Image
             style={styles.info1}
             resizeMode="cover"
-            source={require("../../assets/info1.png")}
+            source={require("../../assets/info2.png")}
         />
         <Image
             style={[
@@ -27,44 +33,47 @@ const IntroPage1 = () => {
             source={require("../../assets/background1.png")}
         />
 
+
         <Text style={[styles.text2Container, styles.containerPosition]}>
-            <Text style={styles.white1}>{`You Deserve `}</Text>
-            <Text style={styles.yellow1}>Effort.</Text>
+            <Text style={styles.white1}>{`Like `}</Text>
+            <Text style={styles.yellow1}>Something?</Text>
+        </Text>
+        <Text style={[styles.text2Container, styles.containerPosition]}>
+            <Text style={styles.white1}>{`Say `}</Text>
+            <Text style={styles.yellow1}>Something.</Text>
         </Text>
 
         <Text style={[styles.text1Container, styles.containerPosition]}>
-            <Text style={styles.white}>{`Dating apps `}</Text>
-            <Text style={styles.yellow}>suck</Text>
-            <Text style={styles.white}>{`. People swipe mindlessly and put zero effort. On `}</Text>
-            <Text style={styles.yellow}>Hart</Text>
-            <Text style={styles.white}>{`, people actually `}</Text>
-            <Text style={styles.yellow}>put in effort!</Text>
+            <Text style={styles.white}>{`No more idle swiping.
+If you want to match with someone, 
+send a `}</Text>
+            <Text style={styles.yellow}>comment</Text>
+            <Text style={styles.white}>{` instead!`}</Text>
+
         </Text>
 
         <View style={styles.nextlayout}>
-            <View style={[styles.rectangleView, styles.rectangleViewLayout]}>
-                <Pressable style={styles.button} onPress={() => {}}>
-                </Pressable>
-            </View> 
-
             <View style={[styles.introPage1Child1, styles.rectangleViewLayout]} >
                 <Pressable style={styles.button} onPress={() => {}}>
                 </Pressable>
-            </View> 
+            </View>
+            <View style={[styles.rectangleView, styles.rectangleViewLayout]}>
+                <Pressable style={styles.button} onPress={() => {}}>
+                </Pressable>
+            </View>  
         </View>
 
-        <View style={styles.buttonContainer}>
-            <Pressable style={styles.button} onPress={() => {}}>
-                <Text style={styles.next}>Next</Text>
-            </Pressable>
-        </View> 
+        <Pressable style={[styles.buttonContainer, styles.button]} onPress={goToSignup}>
+            <Text style={styles.next}>Get Started</Text>
+        </Pressable>
+     
       
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-    introPage1: {
+    introPage2: {
         backgroundColor: "rgba(0,0,0,0.9)",
         flex: 1,
         width: "100%",
@@ -90,7 +99,7 @@ const styles = StyleSheet.create({
 
     text1Container: {
         top: 140,
-        width: 280,
+        width: 350,
         opacity: 0.6,
     },
     containerPosition: {
@@ -135,7 +144,7 @@ const styles = StyleSheet.create({
         height: 5,
         width: 33,
         borderRadius: 9,
-        marginLeft: 20
+        marginRight: 20
     },
 
     rectangleView: {
@@ -180,4 +189,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default IntroPage1
+export default IntroPage2

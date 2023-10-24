@@ -14,4 +14,7 @@ export const FontFamily = {
   export const Border = {
     br_4xs_9: 9,
   };
+  export const FontSize = {
+    size_lg: 18,
+  };
   

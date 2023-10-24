@@ -2,7 +2,13 @@ import { StyleSheet, View, Image, Text, Pressable } from "react-native";
 import React from 'react'
 import { Color, FontFamily } from '../GlobalStyles'
 
-const IntroPage1 = () => {
+const IntroPage1 = ({navigation}) => {
+
+    const handleChange = () => {
+        navigation.navigate('IntroPage2');
+    }
+
+
   return (
     <View style={styles.introPage1}>
         <Image
@@ -48,16 +54,15 @@ const IntroPage1 = () => {
             </View> 
 
             <View style={[styles.introPage1Child1, styles.rectangleViewLayout]} >
-                <Pressable style={styles.button} onPress={() => {}}>
+                <Pressable style={styles.button} onPress={() => {handleChange}}>
                 </Pressable>
             </View> 
         </View>
-
-        <View style={styles.buttonContainer}>
-            <Pressable style={styles.button} onPress={() => {}}>
-                <Text style={styles.next}>Next</Text>
-            </Pressable>
-        </View> 
+        
+        <Pressable style={[styles.buttonContainer, styles.button]} onPress={handleChange}>
+            <Text style={styles.next}>Next</Text>
+        </Pressable>
+       
       
     </View>
   )
