@@ -2,13 +2,15 @@ import { Image, StyleSheet, Text, View, Pressable, TextInput } from 'react-nativ
 import React, {useState, useRef} from 'react'
 import ContinueButton from '../components/ContinueButton';
 import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 
-const OTP = ({number, verificationId, navigation}) => {
+const OTP = ({number, verificationId}) => {
 
     const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
     const [otpDigits, setOtpDigits] = useState(['', '', '', '','' , '']);
     const [error, setError] = useState('')
     
+    const navigation = useNavigation();
 
     const handleOTP = (text, index) => {
         const newDigits = [...otpDigits];

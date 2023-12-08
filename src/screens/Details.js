@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, View, Pressable, TextInput } from 'react-native'
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import ContinueButton from '../components/ContinueButton'
 import {Picker} from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -16,11 +16,13 @@ const Details = ({navigation, addBasicDetail}) => {
     const [name, setName] = useState('')
     const [selectedGender, setSelectedGender] = useState('Gender');
     const [date, setDate] = useState(new Date())
-    const [open, setOpen] = useState(false)
+    const [open1, setOpen1] = useState(false)
+    const [open2, setOpen2] = useState(false)
     const [basicDetail, setBasicDetail] = useState({});
     const [show, setShow] = useState(false);
-    const [value, setValue] = useState(null);
-    const [items, setItems] = useState([
+    const [value1, setValue1] = useState(null);
+    const [value2, setValue2] = useState(null);
+    const [items1, setItems1] = useState([
         {label: 'Male', value: 'Male'},
         {label: 'Female', value: 'Female'},
         {label: "Non-binary", value: "Non-binary"},
@@ -41,11 +43,24 @@ const Details = ({navigation, addBasicDetail}) => {
         {label: "Gender Nonconforming", value: "Gender Nonconforming"},
         
     ]);
+    const [items2, setItems2] = useState([]);
 
     const [openPhotoRoute, setOpenPhotoRoute] = useState(false)
     
     //const gender = ['Male' , "Female", "Non-binary", "Genderqueer", "Genderfluid", "Agender", "Bigender", "Two-Spirit", "Androgynous", "Demiboy", "Demigirl", "Genderflux", "Neutrois", "Pangender", "Third Gender", "Transgender", "Cisgender", "Gender Nonconforming"]
+    var heightArray = [];
+    for (let feet = 4; feet <= 7; feet++) {
+        for (let inches = 0; inches < 12; inches++) {
+          heightArray.push({label: `${feet}'${inches}"`, value: `${feet}'${inches}"`});
+        }
+        
+    }
 
+    
+    
+    // useEffect(() => {
+
+    // },[])
 
     const onChangeName = (e) => {
         setName(e)
@@ -55,8 +70,9 @@ const Details = ({navigation, addBasicDetail}) => {
     const onContinue = () => {
         const basic_details = {
             name: name,
-            gender: value,
-            dateOfBirth: date.getTime()
+            gender: value1,
+            dateOfBirth: date.getTime(),
+            height: value2
         }
         setBasicDetail(basic_details)
         addBasicDetail(basic_details);
@@ -138,15 +154,15 @@ yourself to us`}</Text>
                     </View>
                     <View style={styles.pickerDiv}>
                         <DropDownPicker
-                            open={open}
-                            value={value}
-                            items={items}
-                            setOpen={setOpen}
-                            setValue={setValue}
-                            setItems={setItems}
+                            open={open1}
+                            value={value1}
+                            items={items1}
+                            setOpen={setOpen1}
+                            setValue={setValue1}
+                            setItems={setItems1}
                             style={{
                                 backgroundColor: '#2F2F2F',
-                                width: 180,
+                                width: 160,
                                 height: 60,
                             }}
                             labelStyle={{
@@ -161,17 +177,59 @@ yourself to us`}</Text>
                             dropDownContainerStyle={{
                                 backgroundColor: '#2F2F2F', 
                                 width: 180,
+                                paddingBottom: 5,
+                                marginBottom: 20
                             }}
                             placeholder="Gender"
                             iconContainerStyle={{
                                 color: '#FFF'
                             }}
-                            ArrowDownIconComponent={({style}) => <Image source={require("../../assets/dropdown-img.png")} style={{...style, color: '#fff'}} />}
+                            ArrowDownIconComponent={({style}) => <Image source={require("../../assets/dropdown-img.png")}  />}
+                            ArrowUpIconComponent={({style}) => <Image source={require("../../assets/dropdownUp-img.png")}  />}
+
                         />
                     </View>
                     
                    
                 </View>
+                <View style={styles.pickerDiv}>
+                        <DropDownPicker
+                            open={open2}
+                            value={value2}
+                            items={heightArray}
+                            setOpen={setOpen2}
+                            setValue={setValue2}
+                            setItems={setItems2}
+                            style={{
+                                backgroundColor: '#2F2F2F',
+                                width: 180,
+                                height: 60,
+                                marginTop: 20
+                            }}
+                            labelStyle={{
+                                backgroundColor: '#2F2F2F', 
+                            }}
+                            textStyle={{
+                                fontSize: 18,
+                                fontFamily: 'LibreBaskerville-Bold',
+                                color: '#fff',
+                                backgroundColor: '#2F2F2F', 
+                            }}
+                            dropDownContainerStyle={{
+                                backgroundColor: '#2F2F2F', 
+                                width: 180,
+                                paddingBottom: 5,
+                                marginBottom: 20
+                            }}
+                            placeholder="Height"
+                            iconContainerStyle={{
+                                color: '#FFF'
+                            }}
+                            ArrowDownIconComponent={({style}) => <Image source={require("../../assets/dropdown-img.png")}  />}
+                            ArrowUpIconComponent={({style}) => <Image source={require("../../assets/dropdownUp-img.png")}  />}
+
+                        />
+                    </View>
 
                 <ContinueButton onPress={onContinue}/>
             </View>
@@ -196,11 +254,12 @@ const styles = StyleSheet.create({
     background11: {
         opacity: 1,
         height: 500,
-        width: '100%',
+        width: 400,
         position: "absolute",
     },
     background2: {
         top: 500,
+        //width: 10,
     },
     text1: {
         marginTop: 110,
@@ -274,7 +333,7 @@ const styles = StyleSheet.create({
     },
     
 
-  });
+});
 
 // const mapStateToProps = (state) => ({
     

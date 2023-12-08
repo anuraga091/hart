@@ -12,6 +12,7 @@ import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/redux/store';
+import Prompts from './src/screens/Prompts';
 
 
 const Stack = createNativeStackNavigator();
@@ -34,6 +35,7 @@ function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
+        
         <NavigationContainer >
           <Stack.Navigator>
           {!user ? (
@@ -60,6 +62,11 @@ function App() {
               <Stack.Screen
                 name="Details"
                 component={Details}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Prompts"
+                component={Prompts}
                 options={{ headerShown: false }}
               />
             </>
