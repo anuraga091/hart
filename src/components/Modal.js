@@ -1,51 +1,84 @@
-import { Image, StyleSheet, Text, View, Pressable, TextInput, ScrollView, Modal } from 'react-native'
+import { Image, StyleSheet, Text, View, Pressable, TextInput, ScrollView, Modal, Button } from 'react-native'
 import React,{useState} from 'react'
 import ContinueButton from './ContinueButton'
 import { connect} from 'react-redux';
 import { addBasicDetail, basic_detail, updateBasicDetail } from '../redux/reducer/basicDetailsSlice';
 //import { BlurView } from "@react-native-community/blur";
 
-const PromptModal = ({modalVisible, setModalVisible, prompt, promptIndex, addBasicDetail, updateBasicDetail, basic_detail}) => {
-    
+const PromptModal = ({modalVisible, setModalVisible, promptText,setPromptText,  prompt, setPrompt, promptIndex, setPromptIndex, category, setCategory, promptData, setPromptData, addBasicDetail, updateBasicDetail, basic_detail}) => {
+    //console.log(modalVisible, prompt, promptIndex, category, promptData)
     console.log(basic_detail)
-    const [promptText, setPromptText] = useState('')
+    //const [promptText, setPromptText] = useState('')
     const [error, setError] = useState(false)
     console.log(promptText)
 
-    const onContinue = () => {
-        if (promptText === ''){
-            setError(true)
-        } else {
-            const selectedPrompt = {[prompt]: promptText}
-            addBasicDetail({promptSelected : selectedPrompt})
-            console.log(selectedPrompt)
-            
-        }
 
+    const onContinue = () => {
+        if (!promptText.trim()) {
+            setError(true);
+        } else {
+            uploadAnswers(category, prompt, promptText, (updatedPromptData) => {
+                addBasicDetail({ prompt: updatedPromptData });
+                setModalVisible(false);
+            });
+            setModalVisible(false)
+        }
+    };
+
+    const handleCancel = () => {
+        setModalVisible(false)
     }
+
+
+    const uploadAnswers = (category, prompt, value, callback) => {
+        setPromptData(prevPrompts => {
+            const updatedPrompts = {
+                ...prevPrompts,
+                [category]: {
+                    ...prevPrompts[category],
+                    [prompt]: value
+                }
+            };
+    
+            if (callback) {
+                callback(updatedPrompts);
+            }
+    
+            return updatedPrompts;
+        });
+    };
 
   return (
     
     <Modal animationType='slide' transparent={true} visible={modalVisible} onRequestClose={()=>{setModalVisible(!modalVisible)}}>
         <View style={styles.modalView}>
             <View style={styles.promptComponent}>
-                <Image
-                    resizeMode="cover"
-                    source={require("../../assets/Cross-Button.png")}
-                    style={styles.crossButton}
-                />
+                <Pressable onPress={handleCancel}>
+                    <View>
+                        <Image
+                            resizeMode="cover"
+                            source={require("../../assets/Cross-Button.png")}
+                            style={styles.crossButton}
+                        />
+                    </View>
+                    
+                </Pressable>
+                
                 <View style={styles.prompt}>
                     <Text style={styles.textHeading}>{prompt}</Text>
                     <TextInput
                         multiline={true}
                         numberOfLines={7}
-                        onChangeText={(text) => setPromptText(text)}
+                        onChangeText={setPromptText}
                         value={promptText}
                         placeholder={'Type here...'}
                         style={styles.inputText}
                         placeholderTextColor= {'#797979'}
                         textAlignVertical={'top'}
                     />
+                    { error &&
+                        <Text style={styles.error}>{`Please enter your message`}</Text>
+                    }
                 </View>
                 <View style={styles.button}>
                     <ContinueButton onPress={onContinue}/>
@@ -100,7 +133,8 @@ const styles = StyleSheet.create({
     },
     button: {
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 40
         
     },
     categoryDiv: {
@@ -203,6 +237,14 @@ const styles = StyleSheet.create({
         paddingLeft: 20,
         marginRight: 20
     },
+    error: {
+        color: '#E66767',
+        fontFamily: 'LibreBaskerville-Bold',
+        fontSize: 14,
+        marginTop: 30,
+        textAlign: 'center'
+    },
+    
     
 
 });

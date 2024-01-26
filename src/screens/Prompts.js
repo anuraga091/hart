@@ -2,8 +2,11 @@ import { Image, StyleSheet, Text, View, Pressable, TextInput, ScrollView } from 
 import React,{useEffect, useState} from 'react'
 import prompts from '../utils/prompt_data'
 import PromptModal from '../components/Modal'
+import ContinueButton from '../components/ContinueButton'
+import { connect} from 'react-redux';
+import { addBasicDetail } from '../redux/reducer/basicDetailsSlice'
 
-const Prompts = () => {
+const Prompts = ({addBasicDetail, all_detail}) => {
 
     const [open, setOpen] = useState(false);
     const [prompt, setPrompt] = useState('')
@@ -11,6 +14,18 @@ const Prompts = () => {
     const [promptIndex, setPromptIndex] = useState('')
     const [category, setCategory] = useState('Personal')
     const [modalVisible, setModalVisible] = useState(false);
+    const [promptData, setPromptData] = useState(prompts)
+    const [promptText, setPromptText] = useState('')
+    const [answersCount, setAnswersCount] = useState(0);
+
+    
+
+    useEffect(() => {
+        const count = Object.keys(promptData).reduce((total, cat) => {
+          return total + Object.values(promptData[cat]).filter(answer => answer.trim() !== '').length;
+        }, 0);
+        setAnswersCount(count);
+    }, [promptData]);
 
     const showSelectedPrompts = (obj, key) => {
         setCategory(obj)
@@ -19,11 +34,21 @@ const Prompts = () => {
     }
 
     const showPrompt = (prompt, key) => {
-        console.log('clicked')
+        if (answersCount >= 3) {
+            alert("You can only answer three prompts.");
+            return;
+        }
         setModalVisible(true)
         setPrompt(prompt)
         setPromptIndex(key)
+        const currentAnswer = promptData[category][prompt];
+        setPromptText(currentAnswer || '');
     }
+
+    const onContinue = () => {
+        addBasicDetail(all_detail)   
+    }
+
 
   return (
     <ScrollView style={styles.promptDiv}>
@@ -47,7 +72,7 @@ const Prompts = () => {
       <View style={{height: 100}}>
         <ScrollView horizontal style={styles.categoryDiv}>
             {
-                Object.keys(prompts).map((obj, key) => (
+                Object.keys(promptData).map((obj, key) => (
                     <Pressable onPress={() => showSelectedPrompts(obj, key)} key={key}>
                         <View style={activeIndex !== key ? styles.category : styles.activeCategory}>
                             <Text style={activeIndex !== key ? styles.text2 : styles.activeText2} >{obj}</Text>
@@ -61,10 +86,27 @@ const Prompts = () => {
       
       
       {
-        prompts[category].map((prompt, key) => (
+        Object.keys(promptData[category]).map((prompt, key) => (
             <Pressable onPress={() => showPrompt(prompt, key)} key={key}>
                 <View style={styles.prompts} >
-                    <Text style={styles.promptText} >{prompt}</Text>
+                    <View>
+                        <Text style={styles.promptText} >{prompt}</Text>
+                        {
+                           promptData[category][prompt] ?
+                           <Text style={styles.promptTextAnswer} >{promptData[category][prompt]}</Text>
+                           : ''
+                        }
+                    </View>
+                    <View>
+                        {promptData[category][prompt] ?
+                            <Image
+                                resizeMode="cover"
+                                source={require("../../assets/tick.png")}
+                                style={styles.tick}
+                            />
+                            : null
+                        }
+                    </View>
                 </View>
             </Pressable>
         ))
@@ -72,11 +114,20 @@ const Prompts = () => {
 
       {
         modalVisible ? 
-            <PromptModal modalVisible={modalVisible} setModalVisible={setModalVisible} prompt={prompt} promptIndex={promptIndex}/>
+            <PromptModal modalVisible={modalVisible} setModalVisible={setModalVisible} prompt={prompt} setPrompt={setPrompt} promptText={promptText} setPromptText={setPromptText}
+            promptIndex={promptIndex} setPromptIndex={setPromptIndex} category={category} setCategory={setCategory} promptData={promptData} setPromptData={setPromptData}/>
         : 
         null
       }
-
+        {
+            answersCount >= 3 ?
+                <View style={styles.button}>
+                    <ContinueButton onPress={onContinue}/>
+                </View>
+            : 
+                <View/>
+            
+        }
        
     </ScrollView>
   )
@@ -146,7 +197,7 @@ const styles = StyleSheet.create({
     text2 : {
         color: '#B8B8B8',
         fontFamily: "Raleway-SemiBold",
-        fontSize: 17,
+        fontSize: 17 ,
         textAlign: 'center',
         paddingTop: 5,
         
@@ -154,13 +205,14 @@ const styles = StyleSheet.create({
     prompts: {
        height: 70,
        backgroundColor: '#2F2F2F',
-       justifyContent: 'center',
+       justifyContent: 'space-between',
        paddingLeft: 20,
        borderTopColor: '#000',
        borderTopWidth: 1,
        borderStyle: 'solid',
        borderBottomColor: '#000',
        borderBottomWidth: 1,
+       flexDirection: 'row'
     },
     promptText: {
         color: '#FFF',
@@ -169,7 +221,32 @@ const styles = StyleSheet.create({
         paddingTop: 5,
 
     },
+    promptTextAnswer: {
+        color: 'rgba(255,255,255,0.6)',
+        fontFamily: "Raleway-SemiBold",
+        fontSize: 14,
+        paddingTop: 5,
+    },
+    tick : {
+        position: 'absolute',
+        right: 20,
+        top: 20
+    },
+    button: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingBottom: 10
+        
+    },
     
 });
 
-export default Prompts
+const mapStateToProps = (state) => ({
+    all_detail: state,
+ });
+ 
+ const mapDispatchToProps = {
+   addBasicDetail,
+ };
+
+export default connect(mapStateToProps, mapDispatchToProps) (Prompts)

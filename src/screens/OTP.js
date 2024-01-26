@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     
     },
     error: {
-        color: '#8A8A88',
+        color: '#E66767',
         fontFamily: 'LibreBaskerville-Bold',
         fontSize: 14,
         marginTop: 10

@@ -22,6 +22,7 @@ const Login = ({navigation}) => {
         try {
             const formattedPhoneNumber = `+91${number}`
             const confirmation = await auth().signInWithPhoneNumber(formattedPhoneNumber);
+            console.log(confirmation)
             setVerificationId(confirmation.verificationId);
           } catch (error) {
             console.error(error);

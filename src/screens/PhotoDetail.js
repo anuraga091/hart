@@ -20,7 +20,8 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
   const [selectedImage3, setSelectedImage3] = useState('');
   const [selectedImage4, setSelectedImage4] = useState('');
   const [s3URLs, setS3URLs] = useState([])
-
+  const [loading, setLoading] = useState(false)
+ 
   const openImagePicker = (ind) => {
     ImagePicker.openPicker({
       cropping: true
@@ -124,23 +125,30 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
     };
 
     await RNS3.put(file, options).then((res) => {
+      console.log('started uploading')
       if (res.status !== 201){
         throw new Error("Failed to upload image to S3");
       } else {
+        console.log('uploaded successfully 1')
         setS3URLs(prevUrls => [...prevUrls, res.body.postResponse.location]);
+        console.log(s3URLs)
       }
       addBasicDetail({urls: s3URLs})
       console.log({...basic_detail, urls: s3URLs })
       if (s3URLs.length === 4){
+        setLoading(false)
         navigation.navigate("Prompts")
+        console.log('uploaded successfully')
       }
     }).catch((err) => {
+      setLoading(false)
       console.error(err);
     })
     
   };
 
   const uploadImagesAndContinue = () => {
+    setLoading(true)
     const imgUrls = [selectedImage1, selectedImage2, selectedImage3, selectedImage4]
     console.log(imgUrls)
     imgUrls.forEach(image => {
@@ -273,7 +281,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   text1: {
-      marginTop: 110,
+      marginTop: 80,
       color: '#F1DEAC', 
       fontFamily: 'LibreBaskerville-Bold',
       fontSize: 16,

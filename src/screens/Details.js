@@ -9,6 +9,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addBasicDetail, updateBasicDetail, deleteBasicDetail } from '../redux/reducer/basicDetailsSlice';
 import PhotoDetail from './PhotoDetail';
 import { connect} from 'react-redux';
+import { getLocation } from '../utils/useLocation';
+import auth from '@react-native-firebase/auth';
+import axios from 'axios';
+import urls from '../utils/urls';
+
 
 
 const Details = ({navigation, addBasicDetail}) => {
@@ -44,8 +49,10 @@ const Details = ({navigation, addBasicDetail}) => {
         
     ]);
     const [items2, setItems2] = useState([]);
-
+    const [loading, setLoading] = useState(false)
     const [openPhotoRoute, setOpenPhotoRoute] = useState(false)
+    const [location, setLocation] = useState(null);
+    const [error, setError] = useState(null);
     
     //const gender = ['Male' , "Female", "Non-binary", "Genderqueer", "Genderfluid", "Agender", "Bigender", "Two-Spirit", "Androgynous", "Demiboy", "Demigirl", "Genderflux", "Neutrois", "Pangender", "Third Gender", "Transgender", "Cisgender", "Gender Nonconforming"]
     var heightArray = [];
@@ -56,27 +63,87 @@ const Details = ({navigation, addBasicDetail}) => {
         
     }
 
-    
-    
-    // useEffect(() => {
+    useEffect(() => {
+        getLocation(
+          (position) => {
+            console.log(position)
+            const lat = position.coords.latitude
+            const long = position.coords.longitude
+            setLocation({
+                lat: lat,
+                long: long
+            });
+          },
+          (error) => {
+            setError(error.message);
+          }
+        );
+    }, []);
 
-    // },[])
 
     const onChangeName = (e) => {
         setName(e)
     }
 
 
-    const onContinue = () => {
+    const onContinue = async () => {
+        setLoading(true)
+        const userId = auth().currentUser.uid;
+        const lastSignInTime = auth().currentUser.metadata.lastSignInTime;
+        const creationTime = auth().currentUser.metadata.creationTime;
+        const phoneNumber = auth().currentUser.phoneNumber;
+        console.log('current user', auth().currentUser)
+        const idToken = await auth().currentUser.getIdToken();
+
+        console.log('user id', userId)
         const basic_details = {
             name: name,
             gender: value1,
             dateOfBirth: date.getTime(),
-            height: value2
+            height: value2,
+            location: location,
+            firebaseUid: userId,
+            phone: phoneNumber,
+            creationTime: creationTime,
+            lastSignInTime: lastSignInTime
         }
-        setBasicDetail(basic_details)
-        addBasicDetail(basic_details);
+
         setOpenPhotoRoute(true)
+                setBasicDetail(basic_details)
+                addBasicDetail(basic_details);
+
+        await axios.post(`http://localhost:3001/users`,
+            {
+                name: name,
+                gender: value1,
+                dateOfBirth: date.getTime(),
+                height: value2,
+                location: location,
+                firebaseUid: userId,
+                phone: phoneNumber,
+                creationTime: creationTime,
+                lastSignInTime: lastSignInTime
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}` 
+                },
+            }).then(res => {
+                console.log(res)
+
+                // setOpenPhotoRoute(true)
+                // setBasicDetail(basic_details)
+                // addBasicDetail(basic_details);
+                setLoading(false)
+            }).catch(err => {
+                console.log(err, err.code),
+                setLoading(false)
+            }
+        )
+        console.log('basic detail', basic_details)
+        
+        
         
     }
 
@@ -204,7 +271,8 @@ yourself to us`}</Text>
                                 backgroundColor: '#2F2F2F',
                                 width: 180,
                                 height: 60,
-                                marginTop: 20
+                                marginTop: 20,
+                                paddingLeft: 20,
                             }}
                             labelStyle={{
                                 backgroundColor: '#2F2F2F', 
@@ -262,7 +330,7 @@ const styles = StyleSheet.create({
         //width: 10,
     },
     text1: {
-        marginTop: 110,
+        marginTop: 80,
         color: '#F1DEAC', 
         fontFamily: 'LibreBaskerville-Bold',
         fontSize: 16
