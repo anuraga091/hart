@@ -5,6 +5,10 @@ import PromptModal from '../components/Modal'
 import ContinueButton from '../components/ContinueButton'
 import { connect} from 'react-redux';
 import { addBasicDetail } from '../redux/reducer/basicDetailsSlice'
+import urls from '../utils/urls'
+import axios from 'axios'
+import auth from '@react-native-firebase/auth';
+
 
 const Prompts = ({addBasicDetail, all_detail}) => {
 
@@ -14,11 +18,17 @@ const Prompts = ({addBasicDetail, all_detail}) => {
     const [promptIndex, setPromptIndex] = useState('')
     const [category, setCategory] = useState('Personal')
     const [modalVisible, setModalVisible] = useState(false);
-    const [promptData, setPromptData] = useState(prompts)
+    const [promptData, setPromptData] = useState({})
     const [promptText, setPromptText] = useState('')
     const [answersCount, setAnswersCount] = useState(0);
+    const [loading, setLoading] = useState(false)
 
-    
+    useEffect(() => {
+        fetch(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/prompts`)
+        .then(response => response.json())
+        .then(data => setPromptData(data))
+        .catch(error => console.error('Error fetching prompts', error));
+    }, []);
 
     useEffect(() => {
         const count = Object.keys(promptData).reduce((total, cat) => {
@@ -45,8 +55,28 @@ const Prompts = ({addBasicDetail, all_detail}) => {
         setPromptText(currentAnswer || '');
     }
 
-    const onContinue = () => {
-        addBasicDetail(all_detail)   
+    const onContinue = async () => {
+        const userId = auth().currentUser.uid;
+        const idToken = await auth().currentUser.getIdToken();
+
+        await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/prompts/${userId}`, 
+        {
+            "responses" : promptData
+        },
+        { 
+            headers: {
+                "Authorization": `Bearer ${idToken}`,
+                'Content-Type': 'application/json',
+            }
+        }).then(res => {
+            console.log(res.data)
+            addBasicDetail(all_detail) 
+            setLoading(false)
+        }).catch(err => {
+            console.error("Unable to save detail now. Please try again later", err, err.code);
+            setLoading(false)
+        })
+          
     }
 
 
@@ -71,7 +101,7 @@ const Prompts = ({addBasicDetail, all_detail}) => {
       <Text style={styles.text1}>Choose 3 prompts</Text>
       <View style={{height: 100}}>
         <ScrollView horizontal style={styles.categoryDiv}>
-            {
+            { Object.keys(promptData).length > 0 &&
                 Object.keys(promptData).map((obj, key) => (
                     <Pressable onPress={() => showSelectedPrompts(obj, key)} key={key}>
                         <View style={activeIndex !== key ? styles.category : styles.activeCategory}>
@@ -85,19 +115,19 @@ const Prompts = ({addBasicDetail, all_detail}) => {
       </View>
       
       
-      {
+      { Object.keys(promptData).length > 0 &&
         Object.keys(promptData[category]).map((prompt, key) => (
             <Pressable onPress={() => showPrompt(prompt, key)} key={key}>
                 <View style={styles.prompts} >
-                    <View>
+                    <View style={styles.promptsView}>
                         <Text style={styles.promptText} >{prompt}</Text>
                         {
-                           promptData[category][prompt] ?
+                           promptData[category][prompt]  ?
                            <Text style={styles.promptTextAnswer} >{promptData[category][prompt]}</Text>
                            : ''
                         }
                     </View>
-                    <View>
+                    <View style={styles.tickView}>
                         {promptData[category][prompt] ?
                             <Image
                                 resizeMode="cover"
@@ -153,7 +183,7 @@ const styles = StyleSheet.create({
         //width: 10,
     },
     text1: {
-        marginTop: 110,
+        marginTop: 80,
         color: '#F1DEAC', 
         fontFamily: 'LibreBaskerville-Bold',
         fontSize: 23,
@@ -214,23 +244,32 @@ const styles = StyleSheet.create({
        borderBottomWidth: 1,
        flexDirection: 'row'
     },
+    promptsView: {
+        justifyContent: 'space-evenly',
+        
+
+    },
     promptText: {
         color: '#FFF',
         fontFamily: "Raleway-SemiBold",
         fontSize: 17,
-        paddingTop: 5,
+        //paddingTop: 5,
 
     },
     promptTextAnswer: {
         color: 'rgba(255,255,255,0.6)',
         fontFamily: "Raleway-SemiBold",
         fontSize: 14,
-        paddingTop: 5,
+        //paddingTop: 5,
+    },
+    tickView: {
+        justifyContent: 'space-evenly',
+
     },
     tick : {
         position: 'absolute',
         right: 20,
-        top: 20
+        top: 30
     },
     button: {
         justifyContent: 'center',

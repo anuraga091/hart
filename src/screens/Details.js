@@ -92,10 +92,8 @@ const Details = ({navigation, addBasicDetail}) => {
         const lastSignInTime = auth().currentUser.metadata.lastSignInTime;
         const creationTime = auth().currentUser.metadata.creationTime;
         const phoneNumber = auth().currentUser.phoneNumber;
-        console.log('current user', auth().currentUser)
         const idToken = await auth().currentUser.getIdToken();
 
-        console.log('user id', userId)
         const basic_details = {
             name: name,
             gender: value1,
@@ -108,11 +106,9 @@ const Details = ({navigation, addBasicDetail}) => {
             lastSignInTime: lastSignInTime
         }
 
-        setOpenPhotoRoute(true)
-                setBasicDetail(basic_details)
-                addBasicDetail(basic_details);
+                
 
-        await axios.post(`http://localhost:3001/users`,
+        await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
             {
                 name: name,
                 gender: value1,
@@ -130,18 +126,15 @@ const Details = ({navigation, addBasicDetail}) => {
                     'Authorization': `Bearer ${idToken}` 
                 },
             }).then(res => {
-                console.log(res)
-
-                // setOpenPhotoRoute(true)
-                // setBasicDetail(basic_details)
-                // addBasicDetail(basic_details);
+                setOpenPhotoRoute(true)
+                setBasicDetail(basic_details)
+                addBasicDetail(basic_details);
                 setLoading(false)
             }).catch(err => {
-                console.log(err, err.code),
+                console.error("Unable to save detail now. Please try again later", err, err.code);
                 setLoading(false)
             }
         )
-        console.log('basic detail', basic_details)
         
         
         

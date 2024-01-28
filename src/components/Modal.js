@@ -7,10 +7,10 @@ import { addBasicDetail, basic_detail, updateBasicDetail } from '../redux/reduce
 
 const PromptModal = ({modalVisible, setModalVisible, promptText,setPromptText,  prompt, setPrompt, promptIndex, setPromptIndex, category, setCategory, promptData, setPromptData, addBasicDetail, updateBasicDetail, basic_detail}) => {
     //console.log(modalVisible, prompt, promptIndex, category, promptData)
-    console.log(basic_detail)
+    //console.log(basic_detail)
     //const [promptText, setPromptText] = useState('')
     const [error, setError] = useState(false)
-    console.log(promptText)
+    //console.log(promptText)
 
 
     const onContinue = () => {

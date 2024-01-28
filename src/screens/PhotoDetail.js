@@ -9,32 +9,32 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { FlatGrid } from 'react-native-super-grid';
 import { addBasicDetail, updateBasicDetail } from '../redux/reducer/basicDetailsSlice';
 import { RNS3 } from 'react-native-aws3';
+import urls from '../utils/urls';
+import axios from 'axios';
+import auth from '@react-native-firebase/auth';
+
 
 
 const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
   const navigation = useNavigation();
+  const [selectedImages, setSelectedImages] = useState(['', '', '', '']);
 
-  //console.log(basic_detail, basic_detail.dateOfBirth)
-  const [selectedImage1, setSelectedImage1] = useState('');
-  const [selectedImage2, setSelectedImage2] = useState('');
-  const [selectedImage3, setSelectedImage3] = useState('');
-  const [selectedImage4, setSelectedImage4] = useState('');
   const [s3URLs, setS3URLs] = useState([])
   const [loading, setLoading] = useState(false)
  
   const openImagePicker = (ind) => {
     ImagePicker.openPicker({
-      cropping: true
+      cropping: true,
+      multiple: true,
+      compressImageMaxWidth: 800,
+      compressImageMaxHeight: 800,
+      compressImageQuality: 0.8,
+      mediaType: 'photo',
+      maxFiles: 4
     }).then(image => {
-      if (ind === 1){
-        setSelectedImage1(image.path);
-      } else if (ind === 2){
-        setSelectedImage2(image.path);
-      } else if (ind === 3){
-        setSelectedImage3(image.path);
-      } else if (ind === 4){
-        setSelectedImage4(image.path);
-      }
+      const newSelectedImages = [...selectedImages];
+      newSelectedImages[ind] = image[0].path;
+      setSelectedImages(newSelectedImages);
       //console.log(image.path);
     });
   }
@@ -105,55 +105,72 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
   //   });
   // }
 
-  
+  const uploadS3URLs = async (res) => {
+    const userId = auth().currentUser.uid;
+    const lastSignInTime = auth().currentUser.metadata.lastSignInTime;
+    const phoneNumber = auth().currentUser.phoneNumber;
+    const idToken = await auth().currentUser.getIdToken();
+
+    await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
+      {
+          firebaseUid: userId,
+          phone: phoneNumber,
+          lastSignInTime: lastSignInTime,
+          profilePictures: res
+      },
+      {
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${idToken}` 
+          },
+      }).then(res => {
+          setLoading(false)
+          navigation.navigate("Prompts");
+      }).catch(err => {
+          console.error("Unable to save detail now. Please try again later", err, err.code);
+          setLoading(false)
+      })
+  }
 
 
-  const uploadImage = async (image) => {
-    const file = {
-        uri: image,
-        name: `${new Date().getTime()}.jpg`,
-        type: 'image/jpeg',
-    };
 
-    const options = {
-      keyPrefix: 'uploads/',
-      bucket: 'hart-user-photos',
-      region: 'ap-south-1',
-      accessKey: 'AKIA3UALKTAA73RKXITB',
-      secretKey: '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',
-      successActionStatus: 201
-    };
-
-    await RNS3.put(file, options).then((res) => {
-      console.log('started uploading')
-      if (res.status !== 201){
-        throw new Error("Failed to upload image to S3");
-      } else {
-        console.log('uploaded successfully 1')
-        setS3URLs(prevUrls => [...prevUrls, res.body.postResponse.location]);
-        console.log(s3URLs)
-      }
-      addBasicDetail({urls: s3URLs})
-      console.log({...basic_detail, urls: s3URLs })
-      if (s3URLs.length === 4){
-        setLoading(false)
-        navigation.navigate("Prompts")
-        console.log('uploaded successfully')
-      }
-    }).catch((err) => {
-      setLoading(false)
-      console.error(err);
-    })
+  const uploadImagesAndContinue = async () => {
+      setLoading(true)
     
-  };
+      const uniqueImages = Array.from(new Set(selectedImages));
+      
+      
 
-  const uploadImagesAndContinue = () => {
-    setLoading(true)
-    const imgUrls = [selectedImage1, selectedImage2, selectedImage3, selectedImage4]
-    console.log(imgUrls)
-    imgUrls.forEach(image => {
-      uploadImage(image);
-    });
+      const imagesToUpload = uniqueImages.filter(image => image !== (null || ''));
+
+      const data = new FormData();
+
+      imagesToUpload.forEach((imageUri, index) => {
+        data.append('images', {
+          uri: Platform.OS === 'android' ? imageUri : imageUri.replace('file://', ''),
+          type: 'image/jpeg',
+          name: `Image-${new Date().getTime()}.jpg`
+        });
+      }); 
+    
+
+      // Send to backend
+      await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/upload`, data, { headers : {
+        'Content-Type' : 'multipart/form-data'
+      }}).then(res => {
+          
+          const result = res.data;
+          
+          uploadS3URLs(result)
+          addBasicDetail({ urls: result.Location }); // Assuming result.urls is an array of S3 URLs
+          //
+          setLoading(false)
+        }).catch (error => {
+          console.error(error);
+          setLoading(false)
+        // Handle errors (e.g., show an alert)
+        })
+    
   }
 
   return (
@@ -166,28 +183,28 @@ your pictures`}</Text>
       <View style={styles.itemContainer}>
         <>
           {
-            selectedImage1 !== '' ? 
+            selectedImages[0] !== '' && selectedImages[0] !== null? 
               <Image
-                source={{ uri: selectedImage1 }}
+                source={{ uri: selectedImages[0] }}
                 style={styles.img}
                 resizeMode="contain"
               />
             :
-            <Pressable onPress={() => openImagePicker(1)}>
+            <Pressable onPress={() => openImagePicker(0)}>
               <View style={styles.imageDiv}>
                 <Image source={require('../../assets/add-img.png')}/>
               </View>
             </Pressable>
           }
           {
-            selectedImage2 !== '' ? 
+            selectedImages[1] !== '' && selectedImages[1] !== null? 
               <Image
-                source={{ uri: selectedImage2 }}
+                source={{ uri: selectedImages[1] }}
                 style={styles.img}
                 resizeMode="contain"
               />
             :
-            <Pressable onPress={() => openImagePicker(2)}>
+            <Pressable onPress={() => openImagePicker(1)}>
               <View style={styles.imageDiv}>
                 <Image source={require('../../assets/add-img.png')}/>
               </View>
@@ -199,14 +216,14 @@ your pictures`}</Text>
       <View style={styles.itemContainer}>
         <>
           {
-            selectedImage3 !== '' ? 
+            selectedImages[2] !== '' && selectedImages[2] !== null? 
               <Image
-                source={{ uri: selectedImage3 }}
+                source={{ uri: selectedImages[2] }}
                 style={styles.img}
                 resizeMode="contain"
               />
             :
-            <Pressable onPress={() => openImagePicker(3)}>
+            <Pressable onPress={() => openImagePicker(2)}>
               <View style={styles.imageDiv}>
                 <Image source={require('../../assets/add-img.png')}/>
               </View>
@@ -214,14 +231,14 @@ your pictures`}</Text>
         
           }
           {
-            selectedImage4 !== '' ? 
+            selectedImages[3] !== '' && selectedImages[3] !== null? 
               <Image
-                source={{ uri: selectedImage4 }}
+                source={{ uri: selectedImages[3] }}
                 style={styles.img}
                 resizeMode="contain"
               />
             :
-            <Pressable onPress={() => openImagePicker(4)}>
+            <Pressable onPress={() => openImagePicker(3)}>
               <View style={styles.imageDiv}>
                 <Image source={require('../../assets/add-img.png')} />
               </View>
