@@ -66,12 +66,16 @@ const Details = ({navigation, addBasicDetail}) => {
     useEffect(() => {
         getLocation(
           (position) => {
-            console.log(position)
+            
             const lat = position.coords.latitude
             const long = position.coords.longitude
+            const altitude = position.coords.altitude
+            const accuracy = position.coords.accuracy
             setLocation({
                 lat: lat,
-                long: long
+                long: long,
+                altitude: altitude,
+                accuracy: accuracy
             });
           },
           (error) => {
@@ -85,8 +89,14 @@ const Details = ({navigation, addBasicDetail}) => {
         setName(e)
     }
 
+    const handleBack = () => {
+        //handle logout
+        console.log('clicked detail')
+    }
+
 
     const onContinue = async () => {
+        console.log('clicked')
         setLoading(true)
         const userId = auth().currentUser.uid;
         const lastSignInTime = auth().currentUser.metadata.lastSignInTime;
@@ -106,35 +116,41 @@ const Details = ({navigation, addBasicDetail}) => {
             lastSignInTime: lastSignInTime
         }
 
+        console.log(basic_details)
+
+        setOpenPhotoRoute(true)
+        setBasicDetail(basic_details)
+        addBasicDetail(basic_details);
+
                 
 
-        await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
-            {
-                name: name,
-                gender: value1,
-                dateOfBirth: date.getTime(),
-                height: value2,
-                location: location,
-                firebaseUid: userId,
-                phone: phoneNumber,
-                creationTime: creationTime,
-                lastSignInTime: lastSignInTime
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${idToken}` 
-                },
-            }).then(res => {
-                setOpenPhotoRoute(true)
-                setBasicDetail(basic_details)
-                addBasicDetail(basic_details);
-                setLoading(false)
-            }).catch(err => {
-                console.error("Unable to save detail now. Please try again later", err, err.code);
-                setLoading(false)
-            }
-        )
+        // await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
+        //     {
+        //         name: name,
+        //         gender: value1,
+        //         dateOfBirth: date.getTime(),
+        //         height: value2,
+        //         location: location,
+        //         firebaseUid: userId,
+        //         phone: phoneNumber,
+        //         creationTime: creationTime,
+        //         lastSignInTime: lastSignInTime
+        //     },
+        //     {
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'Authorization': `Bearer ${idToken}` 
+        //         },
+        //     }).then(res => {
+        //         setOpenPhotoRoute(true)
+        //         setBasicDetail(basic_details)
+        //         addBasicDetail(basic_details);
+        //         setLoading(false)
+        //     }).catch(err => {
+        //         console.error("Unable to save detail now. Please try again later", err, err.code);
+        //         setLoading(false)
+        //     }
+        // )
         
         
         
@@ -174,6 +190,13 @@ const Details = ({navigation, addBasicDetail}) => {
         {
             !openPhotoRoute ?
             <View>
+                <Pressable onPress={handleBack}>
+                    <Image
+                        resizeMode="cover" 
+                        style={styles.backImg}
+                        source={require("../../assets/back.png")}
+                    />
+                </Pressable>
                 <Text style={styles.text1}>
                     A few more things
                 </Text>
@@ -293,6 +316,8 @@ yourself to us`}</Text>
                     </View>
 
                 <ContinueButton onPress={onContinue}/>
+
+                <Text style={styles.page}>1 of 4</Text>
             </View>
             :
             <PhotoDetail/>
@@ -322,8 +347,11 @@ const styles = StyleSheet.create({
         top: 500,
         //width: 10,
     },
+    backImg: {
+        marginTop: 50,
+    },
     text1: {
-        marginTop: 80,
+        marginTop: 40,
         color: '#F1DEAC', 
         fontFamily: 'LibreBaskerville-Bold',
         fontSize: 16
@@ -392,7 +420,17 @@ const styles = StyleSheet.create({
         paddingLeft: 20,
         marginRight: 20
     },
-    
+    page: {
+        color: '#F1DEAC',
+        //font-variant-numeric: lining-nums proportional-nums;
+        fontFamily: "LibreBaskerville-Bold",
+        fontSize: 12,
+        fontStyle: 'normal',
+        marginTop: 30,
+        marginLeft: 5
+        //fontWeight: 700,
+        //lineHeight: 'normal',
+    }
 
 });
 

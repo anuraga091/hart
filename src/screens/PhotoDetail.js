@@ -39,6 +39,21 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
     });
   }
 
+  const handleBack = () => {
+    //handle back
+    console.log('clicked photos', navigation.canGoBack())
+    console.log(navigation.goBack())
+    console.log(navigation.getState());
+
+    //navigation.pop()
+      if (!navigation.canGoBack()){
+        
+        navigation.navigate("Details")
+      }
+    //   navigation.navigate('Details')
+          //navigation.goBack()
+    }
+
 
   // const openImagePicker = (ind) => {
   //   const options = {
@@ -160,10 +175,11 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
       }}).then(res => {
           
           const result = res.data;
-          
-          uploadS3URLs(result)
-          addBasicDetail({ urls: result.Location }); // Assuming result.urls is an array of S3 URLs
+          console.log(result)
+          //uploadS3URLs(result)
+          addBasicDetail({ urls: result }); // Assuming result.urls is an array of S3 URLs
           //
+          navigation.navigate("Prompts");
           setLoading(false)
         }).catch (error => {
           console.error(error);
@@ -175,6 +191,15 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
 
   return (
     <View style={styles.container}>
+      <Pressable onPress={handleBack}>
+        
+          <Image
+              resizeMode="cover" 
+              style={styles.backImg}
+              source={require("../../assets/back.png")}
+          />
+        
+      </Pressable>
       <Text style={styles.text1}>
         Show us your world!
       </Text>
@@ -250,6 +275,8 @@ your pictures`}</Text>
       <View style={styles.button}>
         <ContinueButton onPress={uploadImagesAndContinue}/>
       </View>
+
+      <Text style={styles.page}>2 of 4</Text>
     </View>
   )
 }
@@ -277,6 +304,9 @@ const styles = StyleSheet.create({
   container: {
     
   },
+  backImg: {
+    marginTop: 50,
+  },
   gridView: {
     marginTop: 20,
     
@@ -298,7 +328,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   text1: {
-      marginTop: 80,
+      marginTop: 50,
       color: '#F1DEAC', 
       fontFamily: 'LibreBaskerville-Bold',
       fontSize: 16,
@@ -330,7 +360,18 @@ const styles = StyleSheet.create({
   },
   button: {
     marginLeft: 10
-  }
+  },
+  page: {
+    color: '#F1DEAC',
+    //font-variant-numeric: lining-nums proportional-nums;
+    fontFamily: "LibreBaskerville-Bold",
+    fontSize: 12,
+    fontStyle: 'normal',
+    marginTop: 30,
+    marginLeft: 5
+    //fontWeight: 700,
+    //lineHeight: 'normal',
+}
   
 
 });

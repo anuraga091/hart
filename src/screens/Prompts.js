@@ -8,9 +8,14 @@ import { addBasicDetail } from '../redux/reducer/basicDetailsSlice'
 import urls from '../utils/urls'
 import axios from 'axios'
 import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+
 
 
 const Prompts = ({addBasicDetail, all_detail}) => {
+    console.log(all_detail)
+
+    const navigation = useNavigation();
 
     const [open, setOpen] = useState(false);
     const [prompt, setPrompt] = useState('')
@@ -55,27 +60,33 @@ const Prompts = ({addBasicDetail, all_detail}) => {
         setPromptText(currentAnswer || '');
     }
 
+    console.log(promptData)
+    console.log(prompt)
     const onContinue = async () => {
         const userId = auth().currentUser.uid;
         const idToken = await auth().currentUser.getIdToken();
 
-        await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/prompts/${userId}`, 
-        {
-            "responses" : promptData
-        },
-        { 
-            headers: {
-                "Authorization": `Bearer ${idToken}`,
-                'Content-Type': 'application/json',
-            }
-        }).then(res => {
-            console.log(res.data)
-            addBasicDetail(all_detail) 
-            setLoading(false)
-        }).catch(err => {
-            console.error("Unable to save detail now. Please try again later", err, err.code);
-            setLoading(false)
-        })
+        addBasicDetail({prompt: promptData}) 
+        navigation.navigate("Interest");
+
+        // await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/prompts/${userId}`, 
+        // {
+        //     "responses" : promptData
+        // },
+        // { 
+        //     headers: {
+        //         "Authorization": `Bearer ${idToken}`,
+        //         'Content-Type': 'application/json',
+        //     }
+        // }).then(res => {
+        //     console.log(res.data)
+        //     addBasicDetail({prompt: promptData}) 
+        //     navigation.navigate("Interest");
+        //     setLoading(false)
+        // }).catch(err => {
+        //     console.error("Unable to save detail now. Please try again later", err, err.code);
+        //     setLoading(false)
+        // })
           
     }
 

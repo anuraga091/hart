@@ -5,7 +5,7 @@ import { Color, FontFamily } from '../GlobalStyles'
 const IntroPage1 = ({navigation}) => {
 
     const handleChange = () => {
-        navigation.navigate('IntroPage2');
+        navigation.navigate('login');
     }
 
 
@@ -14,7 +14,7 @@ const IntroPage1 = ({navigation}) => {
         <Image
             style={styles.info1}
             resizeMode="cover"
-            source={require("../../assets/info1.png")}
+            source={require("../../assets/realate-icon.png")}
         />
         <Image
             style={[
@@ -34,11 +34,12 @@ const IntroPage1 = ({navigation}) => {
         />
 
         <Text style={[styles.text2Container, styles.containerPosition]}>
-            <Text style={styles.white1}>{`You Deserve `}</Text>
-            <Text style={styles.yellow1}>Effort.</Text>
+            <Text style={styles.yellow1}>Dating</Text>
+            <Text style={styles.white1}>{` for the real ones. `}</Text>
+            
         </Text>
 
-        <Text style={[styles.text1Container, styles.containerPosition]}>
+        {/* <Text style={[styles.text1Container, styles.containerPosition]}>
             <Text style={styles.white}>{`Dating apps `}</Text>
             <Text style={styles.yellow}>suck</Text>
             <Text style={styles.white}>{`. People swipe mindlessly and put zero effort. On `}</Text>
@@ -57,7 +58,7 @@ const IntroPage1 = ({navigation}) => {
                 <Pressable style={styles.button} onPress={() => {handleChange}}>
                 </Pressable>
             </View> 
-        </View>
+        </View> */}
         
         <Pressable style={[styles.buttonContainer, styles.button]} onPress={handleChange}>
             <Text style={styles.next}>Next</Text>
@@ -76,12 +77,14 @@ const styles = StyleSheet.create({
         height: 800,
         overflow: "hidden",
         alignItems: "center",
+        justifyContent: 'center',
+
     },
-    info1: {
-        top: 100,
-        width: 332,
-        height: 249,
-    },
+    // info1: {
+    //     //top: 100,
+    //     //width: 332,
+    //     //height: 249,
+    // },
 
     background11: {
         opacity: 1,
@@ -93,63 +96,63 @@ const styles = StyleSheet.create({
         top: 500,
     },
 
-    text1Container: {
-        top: 140,
-        width: 280,
-        opacity: 0.6,
-    },
+    // text1Container: {
+    //     top: 140,
+    //     width: 280,
+    //     opacity: 0.6,
+    // },
     containerPosition: {
         textAlign: "center",
     },
-    white: {
-        color: Color.colorWhite,
-        fontSize: 18,
-        lineHeight: 21,
-        fontFamily: "Raleway-SemiBold",
-    },
-    yellow: {
-        color: Color.colorWheat,
-        fontSize: 18,
-        lineHeight: 21,
-        fontFamily: "Raleway-SemiBold",
-    },
+    // white: {
+    //     color: Color.colorWhite,
+    //     fontSize: 18,
+    //     lineHeight: 21,
+    //     fontFamily: "Raleway-SemiBold",
+    // },
+    // yellow: {
+    //     color: Color.colorWheat,
+    //     fontSize: 18,
+    //     lineHeight: 21,
+    //     fontFamily: "Raleway-SemiBold",
+    // },
     white1: {
         color: Color.colorWhite,
-        fontSize: 28,
+        fontSize: 16,
         fontFamily: 'LibreBaskerville-Bold',
 
     },
     yellow1: {
         color: Color.colorWheat,
-        fontSize: 28,
+        fontSize: 16,
         fontFamily: 'LibreBaskerville-Bold',
     },
     text2Container: {
-        top: 120,
+        top: 20,
         
     },
 
-    nextlayout: {
-        position: 'relative',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        top: 200
-    }, 
+    // nextlayout: {
+    //     position: 'relative',
+    //     justifyContent: 'center',
+    //     flexDirection: 'row',
+    //     top: 200
+    // }, 
 
-    rectangleViewLayout: {
-        height: 5,
-        width: 33,
-        borderRadius: 9,
-        marginLeft: 20
-    },
+    // rectangleViewLayout: {
+    //     height: 5,
+    //     width: 33,
+    //     borderRadius: 9,
+    //     marginLeft: 20
+    // },
 
-    rectangleView: {
-        backgroundColor: Color.colorWheat,
-    },
+    // rectangleView: {
+    //     backgroundColor: Color.colorWheat,
+    // },
 
-    introPage1Child1: {
-        backgroundColor: "#343434",
-    },
+    // introPage1Child1: {
+    //     backgroundColor: "#343434",
+    // },
 
     buttonContainer: {
         top: 250,
