@@ -40,7 +40,7 @@ function App() {
         const idToken = await auth.currentUser.getIdToken();
         console.log(user.uid)
         //User is signed in, now check if they've completed onboarding
-        await axios.get(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user/${user.uid}`,
+        await axios.get(`${urls.PROD_URL}/user/${user.uid}`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ function App() {
               <>
                 <Stack.Screen
                   name="Homepage"
-                  component={Homepage}
+                  component={Homepage  }
                   options={{ headerShown: false }}
                 />
               </>

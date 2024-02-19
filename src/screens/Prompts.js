@@ -29,7 +29,7 @@ const Prompts = ({addBasicDetail, all_detail}) => {
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        fetch(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/prompts`)
+        fetch(`${urls.PROD_URL}/prompts`)
         .then(response => response.json())
         .then(data => setPromptData(data))
         .catch(error => console.error('Error fetching prompts', error));
@@ -69,7 +69,7 @@ const Prompts = ({addBasicDetail, all_detail}) => {
         addBasicDetail({prompt: promptData}) 
         navigation.navigate("Interest");
 
-        // await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/prompts/${userId}`, 
+        // await axios.post(`${urls.PROD_URL}/prompts/${userId}`, 
         // {
         //     "responses" : promptData
         // },

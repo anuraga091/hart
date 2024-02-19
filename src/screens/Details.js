@@ -124,7 +124,7 @@ const Details = ({navigation, addBasicDetail}) => {
 
                 
 
-        // await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
+        // await axios.post(`${urls.PROD_URL}/user`,
         //     {
         //         name: name,
         //         gender: value1,

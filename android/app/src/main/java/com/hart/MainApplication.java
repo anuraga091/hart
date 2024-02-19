@@ -1,4 +1,4 @@
-package com.hart;
+package com.realate;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

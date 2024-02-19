@@ -33,7 +33,7 @@ const Interest = ({data}) => {
     const onContinue = async () => {
         const idToken = await auth().currentUser.getIdToken();
 
-        await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
+        await axios.post(`${urls.PROD_URL}/user`,
         {
             name: data.name,
             gender: data.gender,

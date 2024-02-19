@@ -126,7 +126,7 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
     const phoneNumber = auth().currentUser.phoneNumber;
     const idToken = await auth().currentUser.getIdToken();
 
-    await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
+    await axios.post(`${urls.PROD_URL}/user`,
       {
           firebaseUid: userId,
           phone: phoneNumber,
@@ -170,7 +170,7 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
     
 
       // Send to backend
-      await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/upload`, data, { headers : {
+      await axios.post(`${urls.PROD_URL}/upload`, data, { headers : {
         'Content-Type' : 'multipart/form-data'
       }}).then(res => {
           
