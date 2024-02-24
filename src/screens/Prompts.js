@@ -60,11 +60,16 @@ const Prompts = ({addBasicDetail, all_detail}) => {
         setPromptText(currentAnswer || '');
     }
 
-    console.log(promptData)
-    console.log(prompt)
+    const handleBack = () => {
+        //handle logout
+        //console.log('clicked detail')
+    }
+
+
     const onContinue = async () => {
         const userId = auth().currentUser.uid;
         const idToken = await auth().currentUser.getIdToken();
+        console.log(promptData)
 
         addBasicDetail({prompt: promptData}) 
         navigation.navigate("Interest");
@@ -109,6 +114,13 @@ const Prompts = ({addBasicDetail, all_detail}) => {
             resizeMode="cover"
             source={require("../../assets/background1.png")}
         />
+        <Pressable onPress={handleBack}>
+            <Image
+                resizeMode="cover" 
+                style={styles.backImg}
+                source={require("../../assets/back.png")}
+            />
+        </Pressable>
       <Text style={styles.text1}>Choose 3 prompts</Text>
       <View style={{height: 100}}>
         <ScrollView horizontal style={styles.categoryDiv}>
@@ -169,6 +181,7 @@ const Prompts = ({addBasicDetail, all_detail}) => {
                 <View/>
             
         }
+        <Text style={styles.page}>3 of 4</Text>
        
     </ScrollView>
   )
@@ -194,7 +207,7 @@ const styles = StyleSheet.create({
         //width: 10,
     },
     text1: {
-        marginTop: 80,
+        marginTop: 40,
         color: '#F1DEAC', 
         fontFamily: 'LibreBaskerville-Bold',
         fontSize: 23,
@@ -287,6 +300,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingBottom: 10
         
+    },
+    page: {
+        color: '#F1DEAC',
+        //font-variant-numeric: lining-nums proportional-nums;
+        fontFamily: "LibreBaskerville-Bold",
+        fontSize: 12,
+        fontStyle: 'normal',
+        marginTop: 30,
+        marginLeft: 25,
+        marginBottom: 30,
+        //fontWeight: 700,
+        //lineHeight: 'normal',
+    },
+    backImg: {
+        marginTop: 50,
+        marginLeft: 25,
     },
     
 });

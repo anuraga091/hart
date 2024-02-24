@@ -8,10 +8,10 @@ import urls from '../utils/urls';
 import { useNavigation } from '@react-navigation/native';
 import { connect} from 'react-redux';
 import { addBasicDetail } from '../redux/reducer/basicDetailsSlice';
+import { setAuthentication, setOnboardingCompletion } from '../redux/slice/userSlice';
 
-const Interest = ({data}) => {
+const Interest = ({onboarding_data, setAuthentication, setOnboardingCompletion}) => {
 
-    console.log(data)
 
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState(null);
@@ -26,6 +26,8 @@ const Interest = ({data}) => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null);
     const navigation = useNavigation();
+
+    const data = onboarding_data.basicDetails
 
     console.log(value)
 
@@ -45,8 +47,8 @@ const Interest = ({data}) => {
             creationTime: data.creationTime,
             lastSignInTime: data.lastSignInTime,
             prompts: data.prompt,
-            profilePictures: data.urls,
-            lookingFor: value,
+            profilePictures: data.result,
+            interestedIn: value,
             hasCompletedOnboarding: true
         },
         {
@@ -56,6 +58,7 @@ const Interest = ({data}) => {
             },
         }).then(res => {
             navigation.navigate("About-1");
+            setOnboardingCompletion(true)
             //setOpenPhotoRoute(true)
             //setBasicDetail(basic_details)
             //addBasicDetail(basic_details);
@@ -244,11 +247,13 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => ({
-    data: state,
+    onboarding_data: state,
 });
  
 const mapDispatchToProps = {
     addBasicDetail,
+    setOnboardingCompletion,
+    setAuthentication
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Interest)

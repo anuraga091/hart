@@ -91,12 +91,12 @@ const Details = ({navigation, addBasicDetail}) => {
 
     const handleBack = () => {
         //handle logout
-        console.log('clicked detail')
+        //console.log('clicked detail')
     }
 
 
     const onContinue = async () => {
-        console.log('clicked')
+        //console.log('clicked')
         setLoading(true)
         const userId = auth().currentUser.uid;
         const lastSignInTime = auth().currentUser.metadata.lastSignInTime;

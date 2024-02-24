@@ -9,7 +9,8 @@ const About2 = () => {
     const navigation = useNavigation();
 
     const onContinue = () => {
-        navigation.navigate('About-2')
+        console.log(navigation.getState)
+        navigation.navigate('Homepage')
     }
 
   return (

@@ -6,7 +6,7 @@ const basicDetailsSlice = createSlice({
   reducers: {
     addBasicDetail: (state, action) => {
       //console.log(state)
-      //console.log({ ...state, ...action.payload })
+      console.log({ ...state, ...action.payload })
       return { ...state, ...action.payload };
     },
     updateBasicDetail: (state, action) => {

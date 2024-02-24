@@ -1,11 +1,24 @@
 import { StyleSheet, View, Image, Text, Pressable } from "react-native";
-import React from 'react'
+import React,{useEffect} from 'react'
 import { Color, FontFamily } from '../GlobalStyles'
+import { useSelector } from 'react-redux';
+
 
 const IntroPage1 = ({navigation}) => {
 
+    const { isAuthenticated, hasCompletedOnboarding } = useSelector(state => state.user);
+
+    useEffect(() => {
+        if (isAuthenticated && !hasCompletedOnboarding) {
+          navigation.navigate('Details');
+        } else if (isAuthenticated && hasCompletedOnboarding) {
+          navigation.navigate('Homepage');
+        }
+    }, [isAuthenticated, hasCompletedOnboarding, navigation]);
+    
+
     const handleChange = () => {
-        navigation.navigate('login');
+        navigation.navigate('Login');
     }
 
 

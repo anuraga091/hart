@@ -25,9 +25,9 @@ const OTP = ({number, verificationId}) => {
 
 
     const signup = async () => {
-        console.log(otpDigits)
+        //console.log(otpDigits)
         const confirmationCode = otpDigits.join("")
-        console.log(confirmationCode)
+        //console.log(confirmationCode)
         
         const credential = auth.PhoneAuthProvider.credential(
             verificationId,
@@ -35,7 +35,7 @@ const OTP = ({number, verificationId}) => {
         );
         await auth().signInWithCredential(credential).then((res) => {
             navigation.navigate('Details')
-            console.log('Phone authentication successful', res);
+            //console.log('Phone authentication successful', res);
 
         }).catch((error) => {
             if (error.code == 'auth/invalid-verification-code'){

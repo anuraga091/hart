@@ -16,6 +16,7 @@ import auth from '@react-native-firebase/auth';
 
 
 const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
+  console.log(basic_detail)
   const navigation = useNavigation();
   const [selectedImages, setSelectedImages] = useState(['', '', '', '']);
 
@@ -41,9 +42,9 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
 
   const handleBack = () => {
     //handle back
-    console.log('clicked photos', navigation.canGoBack())
-    console.log(navigation.goBack())
-    console.log(navigation.getState());
+    // console.log('clicked photos', navigation.canGoBack())
+    // console.log(navigation.goBack())
+    // console.log(navigation.getState());
 
     //navigation.pop()
       if (!navigation.canGoBack()){
@@ -174,10 +175,10 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
         'Content-Type' : 'multipart/form-data'
       }}).then(res => {
           
-          const result = res.data;
-          console.log(result)
+          const result = res.data.urls;
+          //console.log(result)
           //uploadS3URLs(result)
-          addBasicDetail({ urls: result }); // Assuming result.urls is an array of S3 URLs
+          addBasicDetail({result }); // Assuming result.urls is an array of S3 URLs
           //
           navigation.navigate("Prompts");
           setLoading(false)
