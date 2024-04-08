@@ -127,7 +127,7 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
     const phoneNumber = auth().currentUser.phoneNumber;
     const idToken = await auth().currentUser.getIdToken();
 
-    await axios.post(`${urls.PROD_URL}/user`,
+    await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
       {
           firebaseUid: userId,
           phone: phoneNumber,
@@ -171,14 +171,14 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
     
 
       // Send to backend
-      await axios.post(`${urls.PROD_URL}/upload`, data, { headers : {
+      await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/upload`, data, { headers : {
         'Content-Type' : 'multipart/form-data'
       }}).then(res => {
           
           const result = res.data.urls;
           //console.log(result)
           //uploadS3URLs(result)
-          addBasicDetail({result }); // Assuming result.urls is an array of S3 URLs
+          addBasicDetail({profilePictures: result }); // Assuming result.urls is an array of S3 URLs
           //
           navigation.navigate("Prompts");
           setLoading(false)

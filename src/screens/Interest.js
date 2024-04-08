@@ -10,7 +10,7 @@ import { connect} from 'react-redux';
 import { addBasicDetail } from '../redux/reducer/basicDetailsSlice';
 import { setAuthentication, setOnboardingCompletion } from '../redux/slice/userSlice';
 
-const Interest = ({onboarding_data, setAuthentication, setOnboardingCompletion}) => {
+const Interest = ({onboarding_data, setAuthentication, setOnboardingCompletion, addBasicDetail}) => {
 
 
     const [open, setOpen] = useState(false)
@@ -35,7 +35,7 @@ const Interest = ({onboarding_data, setAuthentication, setOnboardingCompletion})
     const onContinue = async () => {
         const idToken = await auth().currentUser.getIdToken();
 
-        await axios.post(`${urls.PROD_URL}/user`,
+        await axios.post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
         {
             name: data.name,
             gender: data.gender,
@@ -57,11 +57,12 @@ const Interest = ({onboarding_data, setAuthentication, setOnboardingCompletion})
                 'Authorization': `Bearer ${idToken}` 
             },
         }).then(res => {
-            navigation.navigate("About-1");
+            addBasicDetail({
+                interestedIn: value
+            });
             setOnboardingCompletion(true)
-            //setOpenPhotoRoute(true)
-            //setBasicDetail(basic_details)
-            //addBasicDetail(basic_details);
+            navigation.navigate("About-1");
+
             setLoading(false)
         }).catch(err => {
             console.error("Unable to save detail now. Please try again later", err, err.code);
@@ -256,4 +257,4 @@ const mapDispatchToProps = {
     setAuthentication
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Interest)
+export default connect(mapStateToProps, mapDispatchToProps) (Interest)

@@ -5,12 +5,9 @@ const basicDetailsSlice = createSlice({
   initialState: [],
   reducers: {
     addBasicDetail: (state, action) => {
-      //console.log(state)
-      console.log({ ...state, ...action.payload })
       return { ...state, ...action.payload };
     },
     updateBasicDetail: (state, action) => {
-      console.log(action.payload)
       const { id, updatedDetail } = action.payload;
       const existingDetail = state.find((detail) => detail.id === id);
       //console.log(existingDetail)
@@ -25,10 +22,13 @@ const basicDetailsSlice = createSlice({
         state.splice(indexToDelete, 1);
       }
     },
+    logout: (state, action) => {
+      return [];
+    },
   },
 });
 
-export const { addBasicDetail, updateBasicDetail, deleteBasicDetail } = basicDetailsSlice.actions;
+export const { addBasicDetail, updateBasicDetail, deleteBasicDetail, logout } = basicDetailsSlice.actions;
 
 const basicDetailsReducer = basicDetailsSlice.reducer
 export default basicDetailsReducer;

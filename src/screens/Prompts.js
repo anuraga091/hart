@@ -29,7 +29,7 @@ const Prompts = ({addBasicDetail, all_detail}) => {
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        fetch(`${urls.PROD_URL}/prompts`)
+        fetch(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/prompts`)
         .then(response => response.json())
         .then(data => setPromptData(data))
         .catch(error => console.error('Error fetching prompts', error));
