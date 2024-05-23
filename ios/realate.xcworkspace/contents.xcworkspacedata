@@ -2,9 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:hart.xcodeproj">
+      location = "group:/Users/anurag/Work/app/hart/ios/realate.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:realate.xcodeproj">
    </FileRef>
 </Workspace>

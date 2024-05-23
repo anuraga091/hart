@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>org.reactjs.native.example.hart-a</string>
+	<string>org.reactjs.native.example.realate</string>
 	<key>PROJECT_ID</key>
 	<string>hart-dating-app</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,7 +25,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:179444331073:ios:1dd17ffe1810f5c79a0cc0</string>
+	<string>1:179444331073:ios:62358e566b9448529a0cc0</string>
 	<key>DATABASE_URL</key>
 	<string>https://hart-dating-app-default-rtdb.asia-southeast1.firebasedatabase.app</string>
 </dict>
