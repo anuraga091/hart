@@ -1,9 +1,9 @@
 // src/assets/ImgSrc.js
 export const ImgSrc = {
-  profile1: require('../../../assets/TempImg/image1.png'),
-  profile2: require('../../../assets/TempImg/image2.png'),
-  profile: require('../../../assets/TempImg/image.png'),
-  profile3: require('../../../assets/TempImg/image3.png'),
+  profile1: require('../../../assets/TempImg/image1.jpg'),
+  profile2: require('../../../assets/TempImg/image2.jpg'),
+  profile: require('../../../assets/TempImg/image.jpg'),
+  profile3: require('../../../assets/TempImg/image3.jpg'),
 
   proccedarrowe: require('../../../assets/proccedarrowe.png'),
   crossButton: require('../../../assets/Cross-Button.png'),

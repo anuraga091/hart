@@ -1,23 +1,23 @@
 import React, {useRef} from 'react';
 import {
-  Alert,
   Animated,
   Dimensions,
-  Image,
   PanResponder,
   StyleSheet,
   View,
 } from 'react-native';
 // import {AntDesign} from '@expo/vector-icons';
-import {Colors, colors} from '../utils/styles/colors';
+import {colors, Colors} from '../utils/styles/colors';
 import {ImgSrc} from '../utils/styles/ImgSrc';
 import {AppImage} from 'react-native-quick-components';
 import {useNavigation} from '@react-navigation/native';
+import {Fonts} from '../utils/styles/fontsSizes';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
 const {width} = Dimensions.get('window');
-const lockWidth = width * 0.85;
+const lockWidth = width * 0.9;
 const lockHeight = 70;
-const smallgap = 4;
+const smallgap = 6;
 const finalPosition = lockWidth - lockHeight;
 
 export default function SwipeUnlock() {
@@ -72,10 +72,11 @@ export default function SwipeUnlock() {
     }).start();
     setTimeout(() => {
       reset();
+      ReactNativeHapticFeedback.trigger('impactHeavy', {
+        enableVibrateFallback: true,
+        ignoreAndroidSystemSettings: true,
+      });
       navigation.navigate('Chat');
-      // Alert.alert('Wohoo!!!', 'Profile matched 🙀💖😻', [
-      //   {text: 'COOL', onPress: () => reset()},
-      // ]);
     }, 300);
   };
   return (
@@ -89,7 +90,7 @@ export default function SwipeUnlock() {
               transform: [{translateX: translateText}],
             },
           ]}>
-          {'Sweep to match'}
+          {'Slide to match'}
         </Animated.Text>
         <Animated.View
           style={[styles.bar, {transform: [{translateX: translateBtn}]}]}
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
     // flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: '5%',
+    paddingVertical: '4%',
     width: '100%',
     backgroundColor: colors.background,
   },
@@ -120,18 +121,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
     borderWidth: 1.5,
-    borderColor: '#F1DEACCC',
+    borderColor: '#f1ddace9',
   },
   txt: {
     color: '#F1DEAC',
-    fontSize: 17,
-    fontFamily: 'LibreBaskervilleBold',
+    fontSize: 19,
+    fontFamily: Fonts.bold,
+    opacity: 0.7,
   },
   bar: {
     position: 'absolute',
     height: lockHeight - smallgap * 2,
     width: lockHeight - smallgap * 2,
-    // backgroundColor: '#F1DEAC',
     backgroundColor: Colors.transparent,
     borderRadius: lockHeight,
     left: smallgap,

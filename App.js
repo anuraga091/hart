@@ -30,6 +30,7 @@ import ViewUserScreen from './src/screens/ViewUserScreen';
 import {addBasicDetail} from './src/redux/reducer/basicDetailsSlice';
 import {ProfileScreen} from './src/screens/profile/ProfileScreen';
 import {init} from 'react-native-quick-components';
+import {LikedScreen} from './src/screens/LikedScreen/LikedScreen';
 
 init({
   defaultBackgroundColor: 'rgba(0,0,0,0.9)',
@@ -130,7 +131,7 @@ const AppWrapper = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={'ProfileScreen'}
+        initialRouteName={'LikedScreen'}
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="IntroPage1" component={IntroPage1} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
@@ -142,6 +143,7 @@ const AppWrapper = () => {
         <Stack.Screen name="About-2" component={About2} />
         <Stack.Screen name="Homepage" component={Homepage} />
         <Stack.Screen name="Like" component={Likes} />
+        <Stack.Screen name="LikedScreen" component={LikedScreen} />
         <Stack.Screen name="Chat" component={Chat} />
         <Stack.Screen name="About-User" component={AboutUser} />
         <Stack.Screen name="ViewProfile" component={ViewUserScreen} />

@@ -4,17 +4,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {
-  AbsoluteView,
-  AppButton,
-  AppText,
-  AppView,
-  FlexView,
-} from 'react-native-quick-components';
+import {AbsoluteView, AppText, FlexView} from 'react-native-quick-components';
 import {colors, Colors} from '../../utils/styles/colors';
 import {
   Fonts,
@@ -34,93 +27,140 @@ export const ProfileScreen = () => {
   return (
     <FlexView>
       <ScrollView>
-        <ImageBackground source={ImgSrc.background1} style={styles.container}>
+        <ImageBackground
+          source={ImgSrc.background2}
+          resizeMode="cover"
+          style={styles.container}>
           <View style={styles.profileCard}>
-            <Text style={styles.name}>Eshan</Text>
-            <TouchableOpacity style={styles.moreButton} onPress={handleOpen}>
-              <Image source={ImgSrc.returnImg} />
-            </TouchableOpacity>
+            <View style={styles.shadow}>
+              <Text style={styles.name}>Eshan</Text>
 
-            <Image source={ImgSrc.profile} style={styles.image} />
+              <View style={styles.imageshadow}>
+                <Image source={ImgSrc.profile2} style={styles.image} />
+              </View>
+              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
+                <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+              </AbsoluteView>
+            </View>
+          </View>
+
+          <View style={styles.cardShadow}>
+            <View style={styles.card}>
+              <Text style={styles.likePrompt}>A random fact I love</Text>
+
+              <Text style={styles.prompt}>
+                If you stood on Mars in normal clothes, your blood would start
+                to boil and you would die.
+              </Text>
+              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
+                <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+              </AbsoluteView>
+            </View>
+          </View>
+
+          <View style={styles.stripe}>
+            <AppText style={styles.text1}>19</AppText>
+            <View style={styles.separator1} />
+            <AppText style={styles.text1}>Male</AppText>
+            <View style={styles.separator1} />
+            <Image source={ImgSrc.locationPin} />
+            <AppText style={styles.text1}>Hulimavu</AppText>
+            <View style={styles.separator1} />
+            <AppText style={styles.text1}>5'7</AppText>
+          </View>
+
+          <View
+            style={[
+              styles.profileCard,
+              {
+                borderTopRightRadius: 22,
+                borderBottomLeftRadius: 23,
+                borderBottomRightRadius: 20,
+                borderRightWidth: 5,
+                borderBottomWidth: 5,
+                marginBottom: 10,
+                marginTop: 14,
+              },
+            ]}>
+            <Image
+              source={ImgSrc.profile1}
+              style={[styles.image, {width: '100%', height: height * 0.4}]}
+            />
             <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-              <Image source={ImgSrc.likeButton} />
+              <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
             </AbsoluteView>
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.likePrompt}>A random fact I love</Text>
+          <View style={[styles.cardShadow]}>
+            <View style={styles.card}>
+              <Text style={styles.likePrompt}>
+                A place I could live forever
+              </Text>
 
-            <Text style={styles.prompt}>
-              If you stood on Mars in normal clothes, your blood would start to
-              boil and you would die.
-            </Text>
+              <Text style={styles.prompt}>
+                This town called ‘Sardina’ in Italy!
+              </Text>
+              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
+                <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+              </AbsoluteView>
+            </View>
+          </View>
+
+          <View
+            style={[
+              styles.profileCard,
+              {
+                borderTopRightRadius: 22,
+                borderBottomLeftRadius: 23,
+                borderBottomRightRadius: 20,
+                borderRightWidth: 5,
+                borderBottomWidth: 5,
+                // paddingRight: 5,
+              },
+            ]}>
+            <Image
+              style={[styles.image, {width: '100%', height: height * 0.4}]}
+              source={ImgSrc.profile3}
+            />
             <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-              <Image source={ImgSrc.likeButton} />
+              <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+            </AbsoluteView>
+          </View>
+
+          <View style={styles.cardShadow}>
+            <View style={styles.card}>
+              <Text style={styles.likePrompt}>My biggest date fail</Text>
+
+              <Text style={styles.prompt}>
+                Going to a restuarant and catching the girl’s dad spying on us
+              </Text>
+              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
+                <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+              </AbsoluteView>
+            </View>
+          </View>
+
+          <View
+            style={[
+              styles.profileCard,
+              {
+                borderTopRightRadius: 22,
+                borderBottomLeftRadius: 23,
+                borderBottomRightRadius: 20,
+                borderRightWidth: 5,
+                borderBottomWidth: 5,
+              },
+            ]}>
+            <Image
+              source={ImgSrc.profile2}
+              style={[styles.image, {width: '100%', height: height * 0.4}]}
+            />
+            <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
+              <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
             </AbsoluteView>
           </View>
         </ImageBackground>
-        <View style={styles.card1}>
-          <AppText style={styles.text1}>19</AppText>
-          <View style={styles.separator1} />
-          <AppText style={styles.text1}>Male</AppText>
-          <View style={styles.separator1} />
-          <Image source={ImgSrc.locationPin} />
-          <AppText style={styles.text1}>Hulimavu</AppText>
-          <View style={styles.separator1} />
-          <AppText style={styles.text1}>5'7</AppText>
-        </View>
 
-        <View style={styles.profileCard}>
-          <Image source={ImgSrc.profile1} style={styles.image} />
-          <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-            <Image source={ImgSrc.likeButton} />
-          </AbsoluteView>
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.likePrompt}>A place I could live forever</Text>
-
-          <Text style={styles.prompt}>
-            This town called ‘Sardina’ in Italy!
-          </Text>
-          <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-            <Image source={ImgSrc.likeButton} />
-          </AbsoluteView>
-        </View>
-
-        <View style={styles.profileCard}>
-          <Image source={ImgSrc.profile3} style={styles.image} />
-
-          <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-            <Image source={ImgSrc.likeButton} />
-          </AbsoluteView>
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.likePrompt}>My biggest date fail</Text>
-
-          <Text style={styles.prompt}>
-            Going to a restuarant and catching the girl’s dad spying on us
-          </Text>
-          <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-            <Image source={ImgSrc.likeButton} />
-          </AbsoluteView>
-        </View>
-        <View style={styles.profileCard}>
-          <Image source={ImgSrc.profile2} style={styles.image} />
-
-          <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-            <Image source={ImgSrc.likeButton} />
-          </AbsoluteView>
-        </View>
-        <AppButton
-          title="Report"
-          BG={Colors.textSecondary1}
-          C={Colors.dark}
-          center
-          W={width * 0.4}
-          FONT={Fonts.bold}
-          H={50}
-          MY={30}
-        />
         <SwipeUnlock />
       </ScrollView>
     </FlexView>
@@ -130,45 +170,85 @@ export const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-    padding: padding.small,
     alignContent: 'center',
     alignItems: 'center',
+
+    marginVertical: 30,
   },
-  card1: {
+  likeIcon: {
+    width: width * 0.158,
+    height: width * 0.158,
+  },
+  shadow: {
+    width: '100%',
+    alignSelf: 'center',
+    borderRightWidth: 0,
+    borderLeftWidth: 2,
+    borderRadius: 20,
+  },
+
+  profileCard: {
+    backgroundColor: colors.profileCardBackground,
+    borderRadius: 20,
+    borderBottomRightRadius: 25,
+    width: '90%',
+    alignSelf: 'center',
+    marginVertical: 15,
+
+    borderRightWidth: 6,
+    borderTopWidth: 1.5,
+    borderBottomWidth: 6,
+    borderLeftWidth: 1,
+    borderColor: 'rgba(255, 252, 252, 0.20)',
+    shadowColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  stripe: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#333',
-    paddingHorizontal: 10,
-    paddingVertical: 15,
-    borderRadius: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    borderRadius: 15,
     justifyContent: 'space-evenly',
     alignSelf: 'center',
-    width: '88%',
+    width: '90%',
     borderColor: colors.border,
     borderWidth: 1,
+    marginTop: 18,
+    marginBottom: 6,
   },
+
   text1: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: fontSizes.xsmall,
     marginHorizontal: 10,
     fontFamily: Fonts.RalewayBold,
   },
   separator1: {
     width: 1,
-    height: '100%',
-    backgroundColor: '#555',
+    height: '108%',
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
     marginHorizontal: 10,
   },
   card: {
     backgroundColor: colors.cardBackground,
-    borderRadius: 10,
-    marginBottom: margin.medium,
-    width: '90%',
+    borderRadius: 15,
+    width: '100%',
     paddingVertical: padding.medium,
     paddingHorizontal: padding.medium,
     borderWidth: 1,
     borderColor: colors.border,
+    alignSelf: 'center',
+  },
+  cardShadow: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    paddingRight: 3,
+    paddingBottom: 3,
+    borderTopEndRadius: 20,
+    borderBottomEndRadius: 15,
+    borderBottomStartRadius: 20,
+    borderTopStartRadius: 20,
+    width: '90%',
     alignSelf: 'center',
   },
   prompt: {
@@ -195,28 +275,18 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.medium,
     fontFamily: 'LibreBaskervilleBold',
   },
-  profileCard: {
-    marginVertical: 25,
-    backgroundColor: colors.profileCardBackground,
-    borderRadius: 10,
-    width: '90%',
-    alignSelf: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 252, 252, 0.20)',
-    shadowColor: 'rgba(255, 255, 255, 0.15)',
-    shadowOffset: {width: 2.25, height: 2}, // horizontal and vertical shadow offset
-    shadowOpacity: 1, // opacity of the shadow
-    shadowRadius: 1, // blur radius
-    elevation: 1, // for Android shadow (doesn't support rgba colors)
 
-    // overflow: "hidden",
-  },
   image: {
     width: '100%',
+    height: '100%',
+    borderRadius: 15,
+  },
+  imageshadow: {
+    width: '101%',
     height: height * 0.4,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
+    borderTopWidth: 1,
+    backgroundColor: colors.border,
+    borderRadius: 15,
   },
   name: {
     color: colors.textWhite,
@@ -237,7 +307,7 @@ const styles = StyleSheet.create({
   moreOptions: {
     width: '60%',
     backgroundColor: colors.moreOptionsBackground,
-    borderRadius: 10,
+    borderRadius: 15,
     padding: 10,
     paddingHorizontal: 25,
     borderColor: colors.border,
