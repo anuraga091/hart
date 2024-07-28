@@ -180,7 +180,7 @@ export const TimelineScreen = () => {
             id: doc.id,
             ...doc.data(),
           }));
-          console.log(usersList);
+          // console.log(usersList);
         });
 
       // console.log(documentSnapshot.docs[0].data());

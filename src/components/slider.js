@@ -46,8 +46,6 @@ export default function SwipeUnlock({user}) {
         useNativeDriver: false,
       }),
       onPanResponderRelease: (e, g) => {
-        console.log(g.dx);
-        console.log(g.vx);
         if (g.vx > 2 || g.dx > lockWidth / 2) {
           unlock();
         } else {
