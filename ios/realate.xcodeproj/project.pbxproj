@@ -18,11 +18,10 @@
 		16EFBA0854374212ACF8AC7F /* Raleway-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 48BCAF60F389464BB0D3902B /* Raleway-Regular.ttf */; };
 		1D0B84BA8C734033B89CA194 /* Raleway-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 26CEA15C2B8D4B66B2F13AC0 /* Raleway-SemiBoldItalic.ttf */; };
 		2133846E6DE945A9A7B7F072 /* Raleway-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DBD78EEE3F1541298B52529F /* Raleway-Medium.ttf */; };
+		23D885792C553FD400BDB7D6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 23D885782C553FD400BDB7D6 /* GoogleService-Info.plist */; };
 		2B3EF4C46BBB4E9E9C916BA4 /* Raleway-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FB9EA2BFBEF49DF8ADE5508 /* Raleway-Light.ttf */; };
 		396384AC2101418D9E0E3A6F /* Raleway-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6BBCA0B8C1564FCB843A4651 /* Raleway-ExtraLightItalic.ttf */; };
 		6A31ADDB2AD241A0ACEED4F3 /* Raleway-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5D83F057BAB6476AAB5B8BC3 /* Raleway-Black.ttf */; };
-		7517A5FA2BFFEB4900825985 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7517A5F92BFFEB4900825985 /* GoogleService-Info.plist */; };
-		7517A5FB2BFFEB4900825985 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7517A5F92BFFEB4900825985 /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		82EE8A58BF5A41079EBB79E0 /* Raleway-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF41B7C588B74396899FB722 /* Raleway-ThinItalic.ttf */; };
 		977BFD82BBD54DD7A0C11D3C /* Raleway-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2434630BECFF41E09A19863A /* Raleway-BoldItalic.ttf */; };
@@ -62,6 +61,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = realate/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = realate/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = realate/main.m; sourceTree = "<group>"; };
+		23D885782C553FD400BDB7D6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		2434630BECFF41E09A19863A /* Raleway-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Raleway-BoldItalic.ttf"; path = "../assets/fonts/Raleway-BoldItalic.ttf"; sourceTree = "<group>"; };
 		267165CF785A4A46AF1C0607 /* Raleway-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Raleway-ExtraBoldItalic.ttf"; path = "../assets/fonts/Raleway-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
 		26CEA15C2B8D4B66B2F13AC0 /* Raleway-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Raleway-SemiBoldItalic.ttf"; path = "../assets/fonts/Raleway-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
@@ -79,7 +79,6 @@
 		6BBCA0B8C1564FCB843A4651 /* Raleway-ExtraLightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Raleway-ExtraLightItalic.ttf"; path = "../assets/fonts/Raleway-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
 		725C28AA219F4472A7139941 /* Raleway-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Raleway-Italic.ttf"; path = "../assets/fonts/Raleway-Italic.ttf"; sourceTree = "<group>"; };
 		7462E51E1306765D7F3F74ED /* Pods-realate-realateTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-realate-realateTests.release.xcconfig"; path = "Target Support Files/Pods-realate-realateTests/Pods-realate-realateTests.release.xcconfig"; sourceTree = "<group>"; };
-		7517A5F92BFFEB4900825985 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = realate/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		986006E54031BF6FA3EE8CDA /* Pods-realate.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-realate.debug.xcconfig"; path = "Target Support Files/Pods-realate/Pods-realate.debug.xcconfig"; sourceTree = "<group>"; };
 		A772E5E1D02E43FDA64B656B /* Raleway-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Raleway-Bold.ttf"; path = "../assets/fonts/Raleway-Bold.ttf"; sourceTree = "<group>"; };
@@ -161,7 +160,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				7517A5F92BFFEB4900825985 /* GoogleService-Info.plist */,
+				23D885782C553FD400BDB7D6 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* realate */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* realateTests */,
@@ -311,7 +310,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7517A5FB2BFFEB4900825985 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,7 +334,7 @@
 				2B3EF4C46BBB4E9E9C916BA4 /* Raleway-Light.ttf in Resources */,
 				A1513EDDFC8046CA9FA3123D /* Raleway-LightItalic.ttf in Resources */,
 				2133846E6DE945A9A7B7F072 /* Raleway-Medium.ttf in Resources */,
-				7517A5FA2BFFEB4900825985 /* GoogleService-Info.plist in Resources */,
+				23D885792C553FD400BDB7D6 /* GoogleService-Info.plist in Resources */,
 				0829046BE48647EC8E35B071 /* Raleway-MediumItalic.ttf in Resources */,
 				16EFBA0854374212ACF8AC7F /* Raleway-Regular.ttf in Resources */,
 				BBB8E82F078848129EA75115 /* Raleway-SemiBold.ttf in Resources */,
@@ -597,6 +595,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3S4X8UK46S;
 				ENABLE_BITCODE = NO;
@@ -612,8 +612,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.realate;
+				PRODUCT_BUNDLE_IDENTIFIER = com.realate;
 				PRODUCT_NAME = realate;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -626,6 +627,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3S4X8UK46S;
 				INFOPLIST_FILE = realate/Info.plist;
@@ -640,8 +643,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.realate.in;
+				PRODUCT_BUNDLE_IDENTIFIER = com.realate;
 				PRODUCT_NAME = realate;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -746,6 +750,8 @@
 					"-ld_classic",
 					"-Wl",
 					"-ld_classic",
+					"-Wl",
+					"-ld_classic",
 					"-Wl -ld_classic ",
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
@@ -828,6 +834,8 @@
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
+					"-Wl",
+					"-ld_classic",
 					"-Wl",
 					"-ld_classic",
 					"-Wl",

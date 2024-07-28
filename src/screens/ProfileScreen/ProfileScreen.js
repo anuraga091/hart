@@ -17,7 +17,7 @@ import {
   padding,
   width,
 } from '../../utils/styles/fontsSizes';
-import {ImgSrc} from '../../utils/styles/ImgSrc';
+import {ImgSrc} from '../../utils/ImgSrc';
 import SwipeUnlock from '../../components/slider';
 
 export const ProfileScreen = () => {

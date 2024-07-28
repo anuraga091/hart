@@ -9,6 +9,7 @@ export const Colors = {
   borderColor: '#000',
   transparent: 'transparent',
   dark: '#000000',
+  boxbg: '#3F3F3F',
 };
 
 export const colors = {

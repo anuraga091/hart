@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 // import {AntDesign} from '@expo/vector-icons';
 import {colors, Colors} from '../utils/styles/colors';
-import {ImgSrc} from '../utils/styles/ImgSrc';
+import {ImgSrc} from '../utils/ImgSrc';
 import {AppImage} from 'react-native-quick-components';
 import {useNavigation} from '@react-navigation/native';
 import {Fonts} from '../utils/styles/fontsSizes';
@@ -20,7 +20,7 @@ const lockHeight = 70;
 const smallgap = 6;
 const finalPosition = lockWidth - lockHeight;
 
-export default function SwipeUnlock() {
+export default function SwipeUnlock({user}) {
   const pan = useRef(new Animated.ValueXY({x: 0, y: 0})).current;
   const navigation = useNavigation();
   const translateBtn = pan.x.interpolate({
@@ -76,7 +76,7 @@ export default function SwipeUnlock() {
         enableVibrateFallback: true,
         ignoreAndroidSystemSettings: true,
       });
-      navigation.navigate('Chat');
+      navigation.navigate('Chat', {user});
     }, 300);
   };
   return (

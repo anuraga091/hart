@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {ImgSrc} from '../../utils/styles/ImgSrc';
+import {ImgSrc} from '../../utils/ImgSrc';
 import SwipeUnlock from '../../components/slider';
 import {BlurView} from '@react-native-community/blur';
 import {colors} from '../../utils/styles/colors';
@@ -25,7 +25,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
 
-export const LikedScreen = () => {
+export const LikedScreen = ({route}) => {
+  const {isComments, user} = route.params;
   const [isOpen, setIsOpen] = useState(false);
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
@@ -44,14 +45,23 @@ export const LikedScreen = () => {
               If you stood on Mars in normal clothes, your blood would start to
               boil and you would die.
             </Text>
-            <Text style={styles.likePrompt}>Liked your prompt</Text>
-            <View style={{width: '90%'}}>
-              <View style={styles.responseBox}>
-                <Text style={styles.response}>Whoa that's so cool!</Text>
-              </View>
+            <Text style={[styles.likePrompt, {paddingBottom: 30}]}>
+              Liked your prompt
+            </Text>
+            {isComments && (
+              <View
+                style={{
+                  width: '90%',
+                  marginBottom: padding.large,
+                  marginTop: -10,
+                }}>
+                <View style={styles.responseBox}>
+                  <Text style={styles.response}>Whoa that's so cool!</Text>
+                </View>
 
-              <View style={styles.triangleRight} />
-            </View>
+                <View style={styles.triangleRight} />
+              </View>
+            )}
           </View>
           <View style={styles.profileCard}>
             <Text style={styles.name}>Kendall</Text>
@@ -68,9 +78,13 @@ export const LikedScreen = () => {
                 navigation.navigate('ProfileScreen');
               }}>
               <Image
-                source={{
-                  uri: ImgSrc.girl,
-                }}
+                source={
+                  !isComments
+                    ? ImgSrc.profile1
+                    : {
+                        uri: ImgSrc.girl,
+                      }
+                }
                 style={styles.image}
               />
             </TouchableOpacity>
@@ -78,7 +92,7 @@ export const LikedScreen = () => {
         </ImageBackground>
       </ScrollView>
 
-      <SwipeUnlock />
+      <SwipeUnlock user={user} />
       {isOpen && (
         <BlurView
           intensity={100}
@@ -134,7 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: margin.medium,
     width: '90%',
-    paddingVertical: padding.large,
+    paddingTop: padding.large,
     paddingHorizontal: padding.medium,
   },
   prompt: {
@@ -149,7 +163,7 @@ const styles = StyleSheet.create({
     color: colors.textAccent,
     fontSize: fontSizes.small,
     marginTop: margin.large,
-    marginBottom: 15,
+    // marginBottom: 15,
     fontFamily: Fonts.primary,
   },
   responseBox: {

@@ -1575,6 +1575,8 @@ PODS:
     - TOCropViewController
   - RNPermissions (4.1.5):
     - React-Core
+  - RNReactNativeHapticFeedback (2.2.0):
+    - React-Core
   - RNScreens (3.32.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
@@ -1638,6 +1640,7 @@ DEPENDENCIES:
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
+  - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -1773,6 +1776,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-crop-picker"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
+  RNReactNativeHapticFeedback:
+    :path: "../node_modules/react-native-haptic-feedback"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   Yoga:
@@ -1852,6 +1857,7 @@ SPEC CHECKSUMS:
   RNFBFirestore: be3b76650231721bad4e9b28bf3a09a3ce62f8bb
   RNImageCropPicker: e7ab6fb43d2fc3e84651e786ef4a080d63b0ed3d
   RNPermissions: 294531ede5a64d1528463e88fffef05675842042
+  RNReactNativeHapticFeedback: ec56a5f81c3941206fd85625fa669ffc7b4545f9
   RNScreens: 835807a1f3c74c8ea0d0b9e089bf14333141f17f
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654

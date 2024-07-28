@@ -1,16 +1,9 @@
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  TextInput,
-} from 'react-native';
+import {Image, StyleSheet, Text, View, TextInput} from 'react-native';
 import React, {useState} from 'react';
-import {Color, FontFamily, FontSize} from '../GlobalStyles';
 import ContinueButton from '../components/ContinueButton';
 import OTP from './OTP';
 import auth from '@react-native-firebase/auth';
+import {firebase} from '@react-native-firebase/firestore';
 
 const Login = ({navigation}) => {
   const [number, setNumber] = useState('');
@@ -22,18 +15,57 @@ const Login = ({navigation}) => {
   };
 
   const sendOTP = async () => {
+    // auth().signOut()
+
+    // const userCredential = await firebase
+    //   .auth()
+    //   .createUserWithEmailAndPassword('a@gmail.com', '123456');
+    // const user = userCredential.user;
+
+    // await firebase
+    //   .firestore()
+    //   .collection('users')
+    //   .doc(user.uid)
+    //   .set({
+    //     id: user.uid,
+    //     displayName: user.email.split('@')[0], // You can modify this to include more user info
+    //     email: user.email,
+    //   })
+    //   .then(data => {
+    //     console.log('result', data);
+    //   })
+    //   .catch(err => {
+    //     console.log('error', err);
+    //   });
+
     auth()
-      .signInAnonymously()
+      .signInWithEmailAndPassword('a@gmail.com', '123456')
       .then(() => {
-        console.log('User signed in anonymously');
+        console.log('User account created & signed in!');
       })
       .catch(error => {
-        if (error.code === 'auth/operation-not-allowed') {
-          console.log('Enable anonymous in your firebase console.');
+        if (error.code === 'auth/email-already-in-use') {
+          console.log('That email address is already in use!');
+        }
+
+        if (error.code === 'auth/invalid-email') {
+          console.log('That email address is invalid!');
         }
 
         console.error(error);
       });
+    // auth()
+    //   .signInAnonymously()
+    //   .then(() => {
+    //     console.log('User signed in anonymously');
+    //   })
+    //   .catch(error => {
+    //     if (error.code === 'auth/operation-not-allowed') {
+    //       console.log('Enable anonymous in your firebase console.');
+    //     }
+
+    //     console.error(error);
+    //   });
 
     // setOtpSent(true);
     // try {
@@ -63,8 +95,7 @@ const Login = ({navigation}) => {
       {!optSent ? (
         <View>
           <Text style={styles.welcometext}>Welcome to our universe!</Text>
-          <Text style={styles.phone}>{`Enter your
-phone number`}</Text>
+          <Text style={styles.phone}>{`Enter your phone number`}</Text>
 
           <TextInput
             style={styles.input}

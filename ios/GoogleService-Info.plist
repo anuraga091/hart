@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyCZGJN96VpPZWFG963lKleu8G0h4h1m1io</string>
+	<string>AIzaSyCeTDRLCSfHOFn9JtbQIvfTm2wdXQjzsQU</string>
 	<key>GCM_SENDER_ID</key>
-	<string>179444331073</string>
+	<string>808180923750</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>org.reactjs.native.example.realate</string>
+	<string>com.realate</string>
 	<key>PROJECT_ID</key>
-	<string>hart-dating-app</string>
+	<string>realate-dating</string>
 	<key>STORAGE_BUCKET</key>
-	<string>hart-dating-app.appspot.com</string>
+	<string>realate-dating.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,8 +25,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:179444331073:ios:62358e566b9448529a0cc0</string>
+	<string>1:808180923750:ios:bd89f511c4684c50715ca7</string>
 	<key>DATABASE_URL</key>
-	<string>https://hart-dating-app-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+	<string>https://realate-dating-default-rtdb.firebaseio.com</string>
 </dict>
 </plist>
