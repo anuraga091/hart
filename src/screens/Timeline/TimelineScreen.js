@@ -1,7 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import {FlatList, Text, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {AppButton, FlexSafeView, FlexView} from 'react-native-quick-components';
+import {
+  AppButton,
+  AppImage,
+  AppView,
+  FlexSafeView,
+  FlexView,
+} from 'react-native-quick-components';
 import {useNavigation} from '@react-navigation/native';
 import {firebase} from '@react-native-firebase/firestore';
 
@@ -212,7 +218,12 @@ export const TimelineScreen = () => {
         borderRadius: 8,
       }}
       onPress={() => handleUserPress(item)}>
-      <Text style={{color: 'white', fontSize: 30}}>{item.displayName}</Text>
+      <AppView disabled style={{flexDirection: 'row', alignItems: 'center'}}>
+        <AppImage source={{uri: item?.image}} BOR={50} SIZE={60} />
+        <Text style={{color: 'white', fontSize: 30, marginLeft: 20}}>
+          {item.displayName}
+        </Text>
+      </AppView>
       <Text style={{color: 'white', fontSize: 10}}>{item?.message}</Text>
     </TouchableOpacity>
   );

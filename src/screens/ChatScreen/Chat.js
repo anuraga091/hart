@@ -6,6 +6,7 @@ import {
   AppImage,
   AppText,
   AppView,
+  FlexSafeView,
   FlexView,
 } from 'react-native-quick-components';
 import {
@@ -16,19 +17,28 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {ImgSrc} from '../../utils/ImgSrc';
-import {FONT_SIZES, Fonts} from '../../utils/styles/fontsSizes';
+import {FONT_SIZES, Fonts, height, width} from '../../utils/styles/fontsSizes';
 import {Colors, colors} from '../../utils/styles/colors';
 import {useNavigation} from '@react-navigation/native';
 import {firebase} from '@react-native-firebase/firestore';
-import {Bubble, GiftedChat, InputToolbar} from 'react-native-gifted-chat';
+import {
+  Bubble,
+  Composer,
+  GiftedChat,
+  InputToolbar,
+  Send,
+} from 'react-native-gifted-chat';
+import {generateUUID, getMessageLevel} from '.';
 
 export const ChatScreen = ({route}) => {
   // const {isComments} = route.params;
   const {goBack} = useNavigation();
 
   const [messages, setMessages] = useState([]);
+  const [isLoading, setisLoading] = useState(true);
   const {user} = route.params;
   const currentUser = firebase.auth().currentUser;
 
@@ -39,6 +49,7 @@ export const ChatScreen = ({route}) => {
       .doc(chatId)
       .collection('messages')
       .add(data);
+
     setMessages(previousMessages => GiftedChat.append(previousMessages, data));
   };
   useEffect(() => {
@@ -128,12 +139,19 @@ export const ChatScreen = ({route}) => {
     );
   }, []);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setisLoading(false);
+    }, 2000);
+  }, []);
+
   const randomQuestion = async (isNewModal = true) => {
     const askedQuestionsIndex = await firebase
       .firestore()
       .collection('chats')
       .doc(chatId)
       .collection('asked_questions')
+      .where('level', '==', getMessageLevel(messages.length))
       .get()
       .then(querySnapshot => {
         // .onSnapshot(querySnapshot => {
@@ -144,12 +162,11 @@ export const ChatScreen = ({route}) => {
         return usersList.map(i => i?.question_index);
         // console.log(usersList);
       });
-
     const level1Questions = await firebase
       .firestore()
       .collection('questions')
-      .doc('level1')
-      .collection('level1Questions')
+      .doc(getMessageLevel(messages.length))
+      .collection(getMessageLevel(messages.length, false))
       .get()
       .then(querySnapshot => {
         // .onSnapshot(querySnapshot => {
@@ -164,6 +181,7 @@ export const ChatScreen = ({route}) => {
     const availableQuestions = level1Questions.filter(
       question => !askedQuestionsIndex.includes(question.id),
     );
+
     if (availableQuestions.length === 0) return null;
     const randomIndex = Math.floor(Math.random() * availableQuestions.length);
     await firebase
@@ -175,8 +193,10 @@ export const ChatScreen = ({route}) => {
         _id: Math.random().toString(36).substring(7),
         createdAt: new Date(),
         question_index: availableQuestions[randomIndex].id,
+        level: getMessageLevel(messages.length),
         user: user,
       });
+
     const data = {
       _id: Math.random().toString(36).substring(7),
       createdAt: new Date(),
@@ -189,9 +209,9 @@ export const ChatScreen = ({route}) => {
     }
     return availableQuestions[randomIndex];
   };
+
   const onDelete = async messageId => {
     try {
-      console.log(messageId);
       await firebase
         .firestore()
         .collection('chats')
@@ -206,9 +226,7 @@ export const ChatScreen = ({route}) => {
 
   const onUpdateMessage = async messageId => {
     try {
-      console.log(messageId);
       const newQuestions = await randomQuestion(false);
-      console.log(newQuestions);
       if (newQuestions) {
         await firebase
           .firestore()
@@ -222,17 +240,58 @@ export const ChatScreen = ({route}) => {
       console.error('Error deleting message: ', error);
     }
   };
+  const renderSend = props => {
+    return (
+      <Send sendButtonProps={{style: {marginHorizontal: 8}}} {...props}>
+        <AppText F_SIZE={FONT_SIZES[16]} FONT={Fonts.bold}>
+          Send
+        </AppText>
+      </Send>
+    );
+  };
+  const renderComposer = props => {
+    return (
+      <Composer
+        {...props}
+        multiline={false}
+        textInputStyle={{
+          color: Colors.textPrimary, // Change this to your desired text color
+          textAlignVertical: 'center',
+        }}
+      />
+    );
+  };
+
   const renderInputToolbar = props => {
     return (
-      <AppView RowSpacBtw>
-        <InputToolbar
-          {...props}
-          containerStyle={styles.input}
-          primaryStyle={styles.primaryStyle}
-        />
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          paddingBottom: 20,
+          paddingTop: 5,
+          paddingHorizontal: width * 0.05,
+        }}>
+        <View style={[{flexDirection: 'row'}]}>
+          <InputToolbar
+            {...props}
+            containerStyle={styles.input}
+            primaryStyle={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              height: height * 0.05,
+            }}
+          />
+        </View>
+
         <AppView
           onPress={() => {
             randomQuestion();
+            if (messages.length === 2) {
+              onDelete(messages[0].id);
+            }
           }}
           W={58}
           H={52}
@@ -241,16 +300,19 @@ export const ChatScreen = ({route}) => {
           FullColumnCenter>
           <AppImage SIZE={30} source={ImgSrc.message} />
         </AppView>
-      </AppView>
+      </View>
     );
   };
   const renderMessage = props => {
-    // console.log(props);
+    // console.log(currentUser.uid);
+    // console.log(props.currentMessage?.user);
     return (
       <>
         {props?.currentMessage?.type === 'post' && (
           <>
-            <Text style={styles.matchText}>You matched with Kendall!</Text>
+            <Text style={styles.matchText}>
+              You matched with {user?.displayName} !
+            </Text>
             <View style={styles.messageBubble}>
               <Text style={styles.messageText}>
                 {props.currentMessage?.data?.prompt}
@@ -298,7 +360,7 @@ export const ChatScreen = ({route}) => {
         )}
         {props?.currentMessage?.type === 'question-modal' && !user?.message && (
           <View style={styles.questionContainer}>
-            <Text style={styles.questionText}>Start with a question? </Text>
+            <Text style={styles.questionText}>Start with a prompt? </Text>
 
             <AppView MT={20} FullRowCenter>
               <AppButton
@@ -312,6 +374,7 @@ export const ChatScreen = ({route}) => {
                 MX={10}
                 onPress={() => {
                   onDelete(props?.currentMessage?.id);
+                  randomQuestion();
                 }}
               />
 
@@ -332,14 +395,14 @@ export const ChatScreen = ({route}) => {
           </View>
         )}
         {props?.currentMessage?.type === 'chat' &&
-          currentUser.uid === props.currentMessage?.user?._id && (
+          currentUser.uid === props.currentMessage?.user?.id && (
             <View
               style={{
-                width: '60%',
+                maxWidth: '60%',
                 overflow: 'visible',
                 marginVertical: 20,
-
                 marginLeft: 20,
+                alignSelf: 'flex-start',
               }}>
               <View style={styles.responseBox}>
                 <Text style={styles.response}>
@@ -352,7 +415,7 @@ export const ChatScreen = ({route}) => {
             </View>
           )}
         {props?.currentMessage?.type === 'chat' &&
-          currentUser.uid !== props.currentMessage?.user?._id && (
+          currentUser.uid !== props.currentMessage?.user?.id && (
             <View
               style={{
                 maxWidth: '60%',
@@ -374,15 +437,35 @@ export const ChatScreen = ({route}) => {
       </>
     );
   };
-
+  if (isLoading) {
+    return (
+      <AppView FullRowCenter>
+        <ActivityIndicator />
+      </AppView>
+    );
+  }
   return (
-    <FlexView PY={40}>
+    <FlexSafeView>
+      <AppView activeOpacity={1} PX={20} BG="transparent" RowSpacBtw>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={goBack} style={styles.backButton}>
+            <AppImage source={ImgSrc.backicon} SIZE={20} BG="transparent" />
+          </TouchableOpacity>
+          <AppImage ML={30} source={{uri: user?.image}} SIZE={45} BOR={50} />
+          <Text style={styles.username}>{user?.displayName}</Text>
+        </View>
+        <Image source={ImgSrc.threeDots} style={{width: 3}} />
+      </AppView>
       <GiftedChat
         messages={messages}
-        onSend={messages => onSend(messages)}
+        onSend={text => {
+          onSend(text);
+        }}
         // renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
         renderMessage={renderMessage}
+        renderSend={renderSend}
+        renderComposer={renderComposer}
       />
 
       {/* <GiftedChat
@@ -526,62 +609,9 @@ export const ChatScreen = ({route}) => {
           <AppImage SIZE={30} source={ImgSrc.message} />
         </AppView>
       </View> */}
-    </FlexView>
+    </FlexSafeView>
   );
 };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#000',
-//   },
-//   header: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'space-between',
-//     padding: 10,
-//     backgroundColor: '#333',
-//   },
-//   backButton: {
-//     padding: 10,
-//   },
-//   backButtonText: {
-//     color: '#fff',
-//     fontSize: 16,
-//   },
-//   headerTitle: {
-//     color: '#fff',
-//     fontSize: 18,
-//   },
-//   messageContainer: {
-//     flexDirection: 'row',
-//     margin: 10,
-//   },
-//   avatar: {
-//     width: 40,
-//     height: 40,
-//     borderRadius: 20,
-//   },
-//   messageContent: {
-//     marginLeft: 10,
-//     padding: 10,
-//     backgroundColor: '#8d0101',
-//     borderRadius: 10,
-//   },
-//   messageText: {
-//     color: '#fff',
-//   },
-//   inputToolbar: {
-//     backgroundColor: '#2257c2',
-//     borderTopWidth: 1,
-//     borderTopColor: '#444',
-//     width: '80%',
-//     position: 'relative',
-//   },
-//   primaryStyle: {
-//     alignItems: 'center',
-//   },
-// });
 
 const styles = StyleSheet.create({
   container: {
@@ -680,15 +710,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#2a2a2a',
     borderRadius: 60,
     // padding: 12,
-    paddingLeft: 18,
+    paddingHorizontal: 10,
+    borderTopWidth: 0, // Hide the top border
+
     color: '#fff',
     // marginTop: 16,
-    width: '80%',
+    width: '90%',
     fontFamily: Fonts.secondary,
     position: 'relative',
-    height: 60,
+    height: height * 0.06,
     alignItems: 'center',
     textAlignVertical: 'center',
+    justifyContent: 'center',
+    borderWidth: 0,
   },
   triangleRight: {
     width: 0,
