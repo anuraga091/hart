@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Vibration,
   View,
 } from 'react-native';
 import React, {useState} from 'react';
@@ -24,6 +25,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 import {ThreeDotIcon} from '../../utils/assetComp/IconComp';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import {AppButton} from 'react-native-quick-components';
 
 export const LikedScreen = ({route}) => {
   const {user} = route.params;
@@ -73,6 +76,11 @@ export const LikedScreen = ({route}) => {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => {
+                // Vibration.vibrate(100);
+                // ReactNativeHapticFeedback.trigger('impactHeavy', {
+                //   enableVibrateFallback: false,
+                //   ignoreAndroidSystemSettings: false,
+                // });
                 navigation.navigate('ProfileScreen', {user});
               }}>
               <Image
@@ -85,7 +93,21 @@ export const LikedScreen = ({route}) => {
           </View>
         </View>
       </ScrollView>
-
+      {/* <AppButton
+        title="Native"
+        onPress={() => {
+          Vibration.vibrate(90);
+        }}
+      />
+      <AppButton
+        title="NON"
+        onPress={() => {
+          ReactNativeHapticFeedback.trigger('impactHeavy', {
+            enableVibrateFallback: true,
+            ignoreAndroidSystemSettings: true,
+          });
+        }}
+      /> */}
       <SwipeUnlock user={user} />
       {isOpen && (
         <BlurView
