@@ -16,6 +16,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Animated,
+  Vibration,
 } from 'react-native';
 import {
   FONT_SIZES,
@@ -294,9 +295,16 @@ export const ChatScreen = ({route}) => {
         <Animated.View style={{transform: [{translateX: iconTranslateX}]}}>
           <AppView
             disabled={isQuesLoading}
-            onPress={() => {
-              randomQuestion();
-              console.log(messages[0].type);
+            onPress={async () => {
+              Vibration.vibrate(90);
+              if (messages[0]?.type === 'question') {
+                const newQuestions = await randomQuestion(false);
+
+                onUpdateMessage(messages[0]?.id, chatId, newQuestions);
+              } else {
+                randomQuestion();
+              }
+
               if (
                 messages.length === 2 &&
                 messages[0].type === 'question-modal'
@@ -477,8 +485,12 @@ export const ChatScreen = ({route}) => {
       </View>
     );
   }
-
-  const renderChatFooter = () => <View style={styles.chatFooter} />;
+  const handleLoadMore = () => {
+    console.log('Loading more');
+    // if (hasMore && !loading) {
+    //   fetchMessages(lastVisible);
+    // }
+  };
 
   // console.log(messages);
   return (
@@ -497,6 +509,8 @@ export const ChatScreen = ({route}) => {
       </AppView>
       <GiftedChat
         textInputRef={ref}
+        onLoadEarlier={handleLoadMore}
+        isLoadingEarlier
         messages={messages}
         onSend={text => {
           onSend(text);
@@ -507,6 +521,11 @@ export const ChatScreen = ({route}) => {
         onInputTextChanged={handleTextChange}
         renderSend={renderSend}
         renderComposer={renderComposer}
+        // isLoadingEarlier
+        // renderLoadEarlier={() => (
+        //   <ActivityIndicator size={30} color={Colors.textPrimary} />
+        // )}
+        // loadEarlier={false}
       />
     </FlexSafeView>
   );
@@ -558,7 +577,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.90)',
     fontFamily: Fonts.secondary,
     fontSize: 17,
-    fontWeight: '700',
     paddingTop: 20,
     paddingBottom: 10,
   },

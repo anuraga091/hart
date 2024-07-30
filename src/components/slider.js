@@ -4,6 +4,7 @@ import {
   Dimensions,
   PanResponder,
   StyleSheet,
+  Vibration,
   View,
 } from 'react-native';
 // import {AntDesign} from '@expo/vector-icons';
@@ -70,10 +71,11 @@ export default function SwipeUnlock({user}) {
       bounciness: 0,
     }).start();
     setTimeout(() => {
-      ReactNativeHapticFeedback.trigger('impactHeavy', {
-        enableVibrateFallback: true,
-        ignoreAndroidSystemSettings: true,
-      });
+      // ReactNativeHapticFeedback.trigger('impactHeavy', {
+      //   enableVibrateFallback: true,
+      //   ignoreAndroidSystemSettings: true,
+      // });
+      Vibration.vibrate(90);
       reset();
 
       navigation.navigate('Chat', {user});

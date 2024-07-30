@@ -23,7 +23,7 @@ import {LikeButtonIcon, PinIcon} from '../../utils/assetComp/IconComp';
 
 export const ProfileScreen = ({route}) => {
   const {user} = route.params;
-
+  // console.log(user?.message);
   return (
     <FlexView>
       <ScrollView>
@@ -38,9 +38,15 @@ export const ProfileScreen = ({route}) => {
               <View style={styles.imageshadow}>
                 <Image source={{uri: user?.image}} style={styles.image} />
               </View>
-              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-                <LikeButtonIcon size={width * 0.16} />
-              </AbsoluteView>
+              {/* {user?.message && (
+                <AbsoluteView
+                  B={10}
+                  R={10}
+                  BG={Colors.transparent}
+                  FullRowCenter>
+                  <LikeButtonIcon size={width * 0.16} />
+                </AbsoluteView>
+              )} */}
             </View>
           </View>
 
@@ -52,9 +58,15 @@ export const ProfileScreen = ({route}) => {
                 If you stood on Mars in normal clothes, your blood would start
                 to boil and you would die.
               </Text>
-              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-                <LikeButtonIcon size={width * 0.16} />
-              </AbsoluteView>
+              {/* {user?.message && (
+                <AbsoluteView
+                  B={10}
+                  R={10}
+                  BG={Colors.transparent}
+                  FullRowCenter>
+                  <LikeButtonIcon size={width * 0.16} />
+                </AbsoluteView>
+              )} */}
             </View>
           </View>
 
@@ -86,9 +98,11 @@ export const ProfileScreen = ({route}) => {
               source={ImgSrc.profile1}
               style={[styles.image, {width: '100%', height: height * 0.4}]}
             />
-            <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-              <LikeButtonIcon size={width * 0.16} />
-            </AbsoluteView>
+            {/* {user?.message && (
+              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
+                <LikeButtonIcon size={width * 0.16} />
+              </AbsoluteView>
+            )} */}
           </View>
 
           <View style={[styles.cardShadow]}>
@@ -100,9 +114,15 @@ export const ProfileScreen = ({route}) => {
               <Text style={styles.prompt}>
                 This town called ‘Sardina’ in Italy!
               </Text>
-              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-                <LikeButtonIcon size={width * 0.16} />
-              </AbsoluteView>
+              {/* {user?.message && (
+                <AbsoluteView
+                  B={10}
+                  R={10}
+                  BG={Colors.transparent}
+                  FullRowCenter>
+                  <LikeButtonIcon size={width * 0.16} />
+                </AbsoluteView>
+              )} */}
             </View>
           </View>
 
@@ -122,9 +142,11 @@ export const ProfileScreen = ({route}) => {
               style={[styles.image, {width: '100%', height: height * 0.4}]}
               source={ImgSrc.profile3}
             />
-            <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-              <LikeButtonIcon size={width * 0.16} />
-            </AbsoluteView>
+            {/* {user?.message && (
+              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
+                <LikeButtonIcon size={width * 0.16} />
+              </AbsoluteView>
+            )} */}
           </View>
 
           <View style={styles.cardShadow}>
@@ -134,9 +156,15 @@ export const ProfileScreen = ({route}) => {
               <Text style={styles.prompt}>
                 Going to a restuarant and catching the girl’s dad spying on us
               </Text>
-              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-                <LikeButtonIcon size={width * 0.16} />
-              </AbsoluteView>
+              {/* {user?.message && (
+                <AbsoluteView
+                  B={10}
+                  R={10}
+                  BG={Colors.transparent}
+                  FullRowCenter>
+                  <LikeButtonIcon size={width * 0.16} />
+                </AbsoluteView>
+              )} */}
             </View>
           </View>
 
@@ -155,9 +183,11 @@ export const ProfileScreen = ({route}) => {
               source={ImgSrc.profile2}
               style={[styles.image, {width: '100%', height: height * 0.4}]}
             />
-            <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-              <LikeButtonIcon size={width * 0.16} />
-            </AbsoluteView>
+            {/* {user?.message && (
+              <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
+                <LikeButtonIcon size={width * 0.16} />
+              </AbsoluteView>
+            )} */}
           </View>
         </ImageBackground>
 
