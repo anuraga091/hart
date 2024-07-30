@@ -1,6 +1,5 @@
 import {
   Image,
-  ImageBackground,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -10,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {ImgSrc} from '../../utils/ImgSrc';
+import {ImgSrc} from '../../utils/assetComp/ImgSrc';
 import SwipeUnlock from '../../components/slider';
 import {BlurView} from '@react-native-community/blur';
 import {colors} from '../../utils/styles/colors';
@@ -23,23 +22,24 @@ import {
   width,
 } from '../../utils/styles/fontsSizes';
 import {useNavigation} from '@react-navigation/native';
-import {RFPercentage, RFValue} from 'react-native-responsive-fontsize';
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {ThreeDotIcon} from '../../utils/assetComp/IconComp';
 
 export const LikedScreen = ({route}) => {
-  const {isComments, user} = route.params;
+  const {user} = route.params;
   const [isOpen, setIsOpen] = useState(false);
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
   const navigation = useNavigation();
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
+    <SafeAreaView style={{flex: 1}}>
       <StatusBar
         translucent={false}
         style="light"
         backgroundColor={colors.background}
       />
       <ScrollView>
-        <ImageBackground source={ImgSrc.background2} style={styles.container}>
+        <View style={styles.container}>
           <View style={styles.card}>
             <Text style={styles.prompt}>
               If you stood on Mars in normal clothes, your blood would start to
@@ -48,15 +48,16 @@ export const LikedScreen = ({route}) => {
             <Text style={[styles.likePrompt, {paddingBottom: 30}]}>
               Liked your prompt
             </Text>
-            {isComments && (
+            {user?.message && (
               <View
                 style={{
                   width: '90%',
                   marginBottom: padding.large,
                   marginTop: -10,
+                  alignItems: 'flex-start',
                 }}>
                 <View style={styles.responseBox}>
-                  <Text style={styles.response}>Whoa that's so cool!</Text>
+                  <Text style={styles.response}>{user?.message}</Text>
                 </View>
 
                 <View style={styles.triangleRight} />
@@ -64,32 +65,25 @@ export const LikedScreen = ({route}) => {
             )}
           </View>
           <View style={styles.profileCard}>
-            <Text style={styles.name}>Kendall</Text>
+            <Text style={styles.name}>{user?.displayName}</Text>
             <TouchableOpacity style={styles.moreButton} onPress={handleOpen}>
-              <Image
-                source={ImgSrc.threeDots}
-                style={{height: 20, width: 4, margin: 6}}
-              />
+              <ThreeDotIcon size={20} />
             </TouchableOpacity>
 
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => {
-                navigation.navigate('ProfileScreen');
+                navigation.navigate('ProfileScreen', {user});
               }}>
               <Image
-                source={
-                  !isComments
-                    ? ImgSrc.profile1
-                    : {
-                        uri: ImgSrc.girl,
-                      }
-                }
+                source={{
+                  uri: user?.image,
+                }}
                 style={styles.image}
               />
             </TouchableOpacity>
           </View>
-        </ImageBackground>
+        </View>
       </ScrollView>
 
       <SwipeUnlock user={user} />

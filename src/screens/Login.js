@@ -1,20 +1,35 @@
-import {Image, StyleSheet, Text, View, TextInput} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useState} from 'react';
 import ContinueButton from '../components/ContinueButton';
 import OTP from './OTP';
 import auth from '@react-native-firebase/auth';
 import {firebase} from '@react-native-firebase/firestore';
+import {useNavigation} from '@react-navigation/native';
+import {Colors} from '../utils/styles/colors';
 
-const Login = ({navigation}) => {
+const Login = () => {
   const [number, setNumber] = useState('');
   const [optSent, setOtpSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [verificationId, setVerificationId] = useState(null);
-
+  const navigation = useNavigation();
   const onChangeNumber = e => {
     setNumber(e);
   };
 
   const sendOTP = async () => {
+    if (number.trim().length === 0) {
+      return;
+    }
+    setIsLoading(true);
+
     // auth().signOut()
 
     // const userCredential = await firebase
@@ -39,9 +54,10 @@ const Login = ({navigation}) => {
     //   });
 
     auth()
-      .signInWithEmailAndPassword('a@gmail.com', '123456')
+      .signInWithEmailAndPassword(`${number}@gmail.com`, '123456')
       .then(() => {
         console.log('User account created & signed in!');
+        navigation.reset({index: 0, routes: [{name: 'TimelineScreen'}]});
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
@@ -53,6 +69,9 @@ const Login = ({navigation}) => {
         }
 
         console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
     // auth()
     //   .signInAnonymously()
@@ -82,17 +101,7 @@ const Login = ({navigation}) => {
 
   return (
     <View style={styles.loginPage}>
-      <Image
-        style={[styles.background1, styles.background11]}
-        resizeMode="cover"
-        source={require('../../assets/background1.png')}
-      />
-      <Image
-        style={[styles.background2, styles.background11]}
-        resizeMode="cover"
-        source={require('../../assets/background1.png')}
-      />
-      {!optSent ? (
+      {!isLoading ? (
         <View>
           <Text style={styles.welcometext}>Welcome to our universe!</Text>
           <Text style={styles.phone}>{`Enter your phone number`}</Text>
@@ -102,13 +111,13 @@ const Login = ({navigation}) => {
             onChangeText={onChangeNumber}
             value={number}
             placeholder="+91"
-            inputMode="tel"
-            keyboardType="phone-pad"
-            maxLength={10}
+            // inputMode="tel"
+            keyboardType="default"
+            // maxLength={10}
             placeholderTextColor="#fff"
           />
 
-          <ContinueButton onPress={sendOTP} />
+          <ContinueButton isLoading={isLoading} onPress={sendOTP} />
         </View>
       ) : (
         verificationId && (
@@ -125,7 +134,7 @@ const Login = ({navigation}) => {
 
 const styles = StyleSheet.create({
   loginPage: {
-    backgroundColor: 'rgba(0,0,0,0.9)',
+    // backgroundColor: 'rgba(0,0,0,0.9)',
     flex: 1,
     width: '120%',
     height: '100%',

@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react';
+import {LogBox} from 'react-native';
+
 import {Provider, useDispatch, useSelector} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {NavigationContainer} from '@react-navigation/native';
@@ -23,10 +25,11 @@ import ViewUserScreen from './src/screens/ViewUserScreen';
 import {ProfileScreen} from './src/screens/ProfileScreen/ProfileScreen';
 import {init} from 'react-native-quick-components';
 import {LikedScreen} from './src/screens/LikedScreen/LikedScreen';
-import {ImageBackground} from 'react-native';
-import {ImgSrc} from './src/utils/ImgSrc';
-import {colors} from './src/utils/styles/colors';
+import {ActivityIndicator, ImageBackground, View} from 'react-native';
+import {ImgSrc} from './src/utils/assetComp/ImgSrc';
+import {Colors, colors} from './src/utils/styles/colors';
 import {TimelineScreen} from './src/screens/Timeline/TimelineScreen';
+import auth from '@react-native-firebase/auth';
 
 init({
   defaultBackgroundColor: 'transparent',
@@ -37,92 +40,32 @@ init({
 const Stack = createNativeStackNavigator();
 
 const AppWrapper = () => {
-  const {isAuthenticated, hasCompletedOnboarding} = useSelector(
-    state => state.user,
-  );
-  const details = useSelector(state => state.basicDetails);
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setisLoggedIn] = useState(false);
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+
+  // Handle user state changes
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
 
   useEffect(() => {
-    const auth = getAuth();
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
 
-    const unsubscribe = onAuthStateChanged(auth, async user => {
-      setLoading(true);
-      if (user) {
-        const idToken = await user.getIdToken();
-        // console.log(idToken);
-        // getLocation(
-        //   position => {
-        //     const lat = position.coords.latitude;
-        //     const long = position.coords.longitude;
-        //     const altitude = position.coords.altitude;
-        //     const accuracy = position.coords.accuracy;
-        //     const location = {
-        //       lat: lat,
-        //       long: long,
-        //       altitude: altitude,
-        //       accuracy: accuracy,
-        //     };
-        //     axios
-        //       .post(
-        //         `${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user/location`,
-        //         {
-        //           firebaseUid: user.uid,
-        //           location: location,
-        //           // Add any other relevant information
-        //         },
-        //         {
-        //           headers: {
-        //             'Content-Type': 'application/json',
-        //             Authorization: `Bearer ${idToken}`,
-        //           },
-        //         },
-        //       )
-        //       .then(res => {
-        //         // Handle response
-        //         console.log('Location updated', res.data);
-        //       })
-        //       .catch(err => {
-        //         console.log('Failed to update location', err);
-        //       });
-        //   },
-        //   error => {
-        //     // setError(error.message);
-        //   },
-        // );
-        // await axios
-        //   .get(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user/${user.uid}`, {
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //       Authorization: `Bearer ${idToken}`,
-        //     },
-        //   })
-        //   .then(res => {
-        //     const {hasCompletedOnboarding, ...restData} = res.data;
-        //     dispatch(addBasicDetail(restData));
-        //     dispatch(setOnboardingCompletion(res.data.hasCompletedOnboarding));
-        //     setLoading(false);
-        //   })
-        //   .catch(err => {
-        //     console.log('No user Found', err);
-        //     setLoading(false);
-        //   });
-        dispatch(setAuthentication(true));
-      } else {
-        dispatch(setAuthentication(false));
-      }
-      setLoading(false);
-    });
+  // if (initializing) return null;
+  // console.log(user);
+  if (initializing) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center'}}>
+        <ActivityIndicator size={50} color={Colors.textSecondary} />
+      </View>
+    );
+  }
 
-    return () => unsubscribe();
-  }, [dispatch]);
-
-  const initialRouteName = isAuthenticated
-    ? hasCompletedOnboarding
-      ? 'Homepage'
-      : 'Details'
-    : 'IntroPage1';
+  const initialRouteName = user ? 'TimelineScreen' : 'Login';
 
   return (
     <ImageBackground
@@ -131,7 +74,7 @@ const AppWrapper = () => {
       style={{flex: 1, backgroundColor: colors.background}}>
       <NavigationContainer style={{backgroundColor: 'transparent'}}>
         <Stack.Navigator
-          initialRouteName={'TimelineScreen'}
+          initialRouteName={initialRouteName}
           screenOptions={{
             headerShown: false,
             contentStyle: {backgroundColor: 'transparent'},

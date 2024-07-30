@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   AbsoluteView,
   AppButton,
@@ -7,64 +8,78 @@ import {
   AppText,
   AppView,
   FlexSafeView,
-  FlexView,
 } from 'react-native-quick-components';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
-  Image,
   StyleSheet,
-  ScrollView,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
-import {ImgSrc} from '../../utils/ImgSrc';
-import {FONT_SIZES, Fonts, height, width} from '../../utils/styles/fontsSizes';
+import {
+  FONT_SIZES,
+  Fonts,
+  height,
+  isIOS,
+  width,
+} from '../../utils/styles/fontsSizes';
 import {Colors, colors} from '../../utils/styles/colors';
 import {useNavigation} from '@react-navigation/native';
 import {firebase} from '@react-native-firebase/firestore';
+import {GiftedChat, InputToolbar} from 'react-native-gifted-chat';
 import {
-  Bubble,
-  Composer,
-  GiftedChat,
-  InputToolbar,
-  Send,
-} from 'react-native-gifted-chat';
-import {generateUUID, getMessageLevel} from '.';
+  firstPostMessage,
+  getMessageLevel,
+  markLastMessages,
+  onDelete,
+  onUpdateMessage,
+  renderComposer,
+  renderSend,
+} from '.';
+import {
+  ChatIcon,
+  LessBackIcon,
+  ReloadIcon,
+  StopIcon,
+  ThreeDotIcon,
+} from '../../utils/assetComp/IconComp';
 
 export const ChatScreen = ({route}) => {
-  // const {isComments} = route.params;
   const {goBack} = useNavigation();
+  const {user} = route.params;
+  const currentUser = firebase.auth().currentUser;
+  const ref = useRef(null);
+  const chatId =
+    currentUser.uid > user.id
+      ? `${currentUser.uid}-${user.id}`
+      : `${user.id}-${currentUser.uid}`;
 
   const [messages, setMessages] = useState([]);
   const [isLoading, setisLoading] = useState(true);
-  const {user} = route.params;
-  const currentUser = firebase.auth().currentUser;
+  const [isQuesLoading, setIsQuesLoading] = useState(false);
+  const [textMessage, setTextMessage] = useState('');
+  const inputWidth = useRef(new Animated.Value(width * 0.75)).current; // initial width
+  const paddLeftX = useRef(new Animated.Value(0)).current; // initial opacity
+  const iconTranslateX = useRef(new Animated.Value(0)).current; // initial position
 
-  const firstPostMessage = data => {
-    firebase
-      .firestore()
-      .collection('chats')
-      .doc(chatId)
-      .collection('messages')
-      .add(data);
-
-    setMessages(previousMessages => GiftedChat.append(previousMessages, data));
-  };
   useEffect(() => {
-    const chatId =
-      currentUser.uid > user.id
-        ? `${currentUser.uid}-${user.id}`
-        : `${user.id}-${currentUser.uid}`;
+    setTimeout(() => {
+      setisLoading(false);
+    }, 1000);
 
+    return clearTimeout();
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = firebase
       .firestore()
       .collection('chats')
       .doc(chatId)
       .collection('messages')
       .orderBy('createdAt', 'desc')
-      .onSnapshot(querySnapshot => {
+      // .limit(10)
+      .onSnapshot(async querySnapshot => {
         const messagesFirestore = querySnapshot.docs.map(doc => {
           const firebaseData = doc.data();
           const data = {
@@ -95,33 +110,36 @@ export const ChatScreen = ({route}) => {
               comments: '',
             },
           };
-          const modalData = {
-            _id: Math.random().toString(36).substring(7),
-            createdAt: new Date(),
-            text: '',
-            user: user,
-            type: 'question-modal',
-          };
 
-          firstPostMessage(data);
-          if (user?.message) {
-            randomQuestion();
-          } else {
-            firstPostMessage(modalData);
-          }
+          firstPostMessage({data, chatId}).then(async d => {
+            if (user && user?.message) {
+              const modalData = {
+                _id: Math.random().toString(36).substring(7),
+                createdAt: new Date(),
+                text: '',
+                user: user,
+                type: 'question-modal',
+              };
+
+              firstPostMessage({data: modalData, chatId});
+            }
+            if (user && !user?.message) {
+              setTimeout(async () => {
+                randomQuestion();
+              }, 2000);
+            }
+          });
         } else {
-          setMessages(messagesFirestore);
+          const updatedMessages = markLastMessages(messagesFirestore).reverse();
+          setMessages(updatedMessages);
         }
       });
 
     return () => unsubscribe();
-  }, []);
-  const chatId =
-    currentUser.uid > user.id
-      ? `${currentUser.uid}-${user.id}`
-      : `${user.id}-${currentUser.uid}`;
+  }, [user]);
+
   const onSend = useCallback((message = []) => {
-    const {_id, createdAt, text} = message[0];
+    const {_id, text} = message[0];
     firebase
       .firestore()
       .collection('chats')
@@ -139,13 +157,8 @@ export const ChatScreen = ({route}) => {
     );
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setisLoading(false);
-    }, 2000);
-  }, []);
-
   const randomQuestion = async (isNewModal = true) => {
+    setIsQuesLoading(true);
     const askedQuestionsIndex = await firebase
       .firestore()
       .collection('chats')
@@ -205,129 +218,139 @@ export const ChatScreen = ({route}) => {
       type: 'question',
     };
     if (isNewModal) {
-      firstPostMessage(data);
+      await firstPostMessage({data, chatId});
     }
+    setIsQuesLoading(false);
+
     return availableQuestions[randomIndex];
   };
 
-  const onDelete = async messageId => {
-    try {
-      await firebase
-        .firestore()
-        .collection('chats')
-        .doc(chatId)
-        .collection('messages')
-        .doc(messageId)
-        .delete();
-    } catch (error) {
-      console.error('Error deleting message: ', error);
+  const handleTextChange = inputText => {
+    setTextMessage(inputText);
+    if (inputText) {
+      Animated.parallel([
+        Animated.timing(inputWidth, {
+          toValue: width * 0.9, // expand to 90% of the screen width
+          duration: 200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(iconTranslateX, {
+          toValue: 100, // move the icon out of the screen
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(paddLeftX, {
+          toValue: width * 0.02, // move the icon out of the screen
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      // Reset the input and move the icon back to its original position
+      Animated.parallel([
+        Animated.timing(inputWidth, {
+          toValue: width * 0.75, // reset to 75% of the screen width
+          duration: 200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(iconTranslateX, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(paddLeftX, {
+          toValue: width * 0, // move the icon out of the screen
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
   };
-
-  const onUpdateMessage = async messageId => {
-    try {
-      const newQuestions = await randomQuestion(false);
-      if (newQuestions) {
-        await firebase
-          .firestore()
-          .collection('chats')
-          .doc(chatId)
-          .collection('messages')
-          .doc(messageId)
-          .update({text: newQuestions?.text});
-      }
-    } catch (error) {
-      console.error('Error deleting message: ', error);
-    }
-  };
-  const renderSend = props => {
-    return (
-      <Send sendButtonProps={{style: {marginHorizontal: 8}}} {...props}>
-        <AppText F_SIZE={FONT_SIZES[16]} FONT={Fonts.bold}>
-          Send
-        </AppText>
-      </Send>
-    );
-  };
-  const renderComposer = props => {
-    return (
-      <Composer
-        {...props}
-        multiline={false}
-        textInputStyle={{
-          color: Colors.textPrimary, // Change this to your desired text color
-          textAlignVertical: 'center',
-        }}
-      />
-    );
-  };
-
   const renderInputToolbar = props => {
     return (
-      <View
+      <Animated.View
         style={{
           flexDirection: 'row',
-          justifyContent: 'space-around',
+          justifyContent: 'space-between',
           alignItems: 'center',
           paddingBottom: 20,
           paddingTop: 5,
-          paddingHorizontal: width * 0.05,
+          paddingHorizontal: width * 0.03,
+          transform: [{translateX: paddLeftX}],
         }}>
-        <View style={[{flexDirection: 'row'}]}>
+        <Animated.View style={[{flexDirection: 'row', width: inputWidth}]}>
           <InputToolbar
             {...props}
-            containerStyle={styles.input}
+            containerStyle={[styles.input]}
             primaryStyle={{
               justifyContent: 'center',
               alignItems: 'center',
               width: '100%',
-              height: height * 0.05,
+              height: width * 0.1,
+              flexDirection: 'row',
             }}
           />
-        </View>
-
-        <AppView
-          onPress={() => {
-            randomQuestion();
-            if (messages.length === 2) {
-              onDelete(messages[0].id);
-            }
-          }}
-          W={58}
-          H={52}
-          BG={Colors.background}
-          BOR={16}
-          FullColumnCenter>
-          <AppImage SIZE={30} source={ImgSrc.message} />
-        </AppView>
-      </View>
+        </Animated.View>
+        <Animated.View style={{transform: [{translateX: iconTranslateX}]}}>
+          <AppView
+            disabled={isQuesLoading}
+            onPress={() => {
+              randomQuestion();
+              console.log(messages[0].type);
+              if (
+                messages.length === 2 &&
+                messages[0].type === 'question-modal'
+              ) {
+                onDelete({messageId: messages[0].id, chatId});
+              }
+            }}
+            W={58}
+            H={52}
+            BG={Colors.background}
+            BOR={16}
+            FullColumnCenter>
+            {isQuesLoading ? (
+              <ActivityIndicator color={Colors.textSecondary} />
+            ) : (
+              <ChatIcon size={30} />
+            )}
+          </AppView>
+        </Animated.View>
+      </Animated.View>
     );
   };
+
   const renderMessage = props => {
-    // console.log(currentUser.uid);
-    // console.log(props.currentMessage?.user);
+    const isLastMessage = props.currentMessage?.id === messages[0]?.id;
+
     return (
-      <>
+      <View style={{paddingBottom: isLastMessage ? 30 : 0}}>
         {props?.currentMessage?.type === 'post' && (
           <>
-            <Text style={styles.matchText}>
-              You matched with {user?.displayName} !
-            </Text>
-            <View style={styles.messageBubble}>
+            <View style={[styles.messageBubble]}>
               <Text style={styles.messageText}>
                 {props.currentMessage?.data?.prompt}
               </Text>
               <Text style={styles.promptText}>Liked your prompt</Text>
-
               {user?.message && (
-                <View style={{width: '80%', marginBottom: 20}}>
+                <View style={{marginBottom: 20, alignItems: 'flex-start'}}>
                   <View style={styles.responseBox}>
-                    <Text style={styles.response}>{user?.message}</Text>
+                    <Text style={[styles.response, {fontFamily: Fonts.bold}]}>
+                      {user?.message}
+                    </Text>
                   </View>
-                  <View style={styles.triangleRight} />
+                  <View
+                    style={[
+                      styles.triangleRight,
+                      {borderBottomColor: colors.responseBackground},
+                    ]}
+                  />
                 </View>
               )}
             </View>
+            <Text style={styles.matchText}>
+              You matched with {user?.displayName}!
+            </Text>
           </>
         )}
 
@@ -337,28 +360,30 @@ export const ChatScreen = ({route}) => {
               {props?.currentMessage?.text}
             </Text>
             <TouchableOpacity
-              onPress={() => {
-                onUpdateMessage(props.currentMessage?.id);
+              onPress={async () => {
+                const newQuestions = await randomQuestion(false);
+
+                onUpdateMessage(props.currentMessage?.id, chatId, newQuestions);
               }}
               style={styles.changeButton}>
-              <AppImage source={ImgSrc.reload} />
+              <ReloadIcon size={18} />
               <Text style={styles.changeButtonText}>Change</Text>
             </TouchableOpacity>
             <AbsoluteView B={10} R={10}>
               <AppView
                 onPress={() => {
-                  onDelete(props?.currentMessage?.id);
+                  onDelete({messageId: props?.currentMessage?.id, chatId});
                 }}
                 FullRowCenter>
-                <AppImage SIZE={14} MX={5} source={ImgSrc.stop} />
-                <AppText F_SIZE={13} C={Colors.background}>
+                <StopIcon size={14} />
+                <AppText MX={4} F_SIZE={13} C={Colors.background}>
                   End
                 </AppText>
               </AppView>
             </AbsoluteView>
           </View>
         )}
-        {props?.currentMessage?.type === 'question-modal' && !user?.message && (
+        {props?.currentMessage?.type === 'question-modal' && (
           <View style={styles.questionContainer}>
             <Text style={styles.questionText}>Start with a prompt? </Text>
 
@@ -373,7 +398,7 @@ export const ChatScreen = ({route}) => {
                 PX={25}
                 MX={10}
                 onPress={() => {
-                  onDelete(props?.currentMessage?.id);
+                  onDelete({messageId: props?.currentMessage?.id, chatId});
                   randomQuestion();
                 }}
               />
@@ -388,7 +413,7 @@ export const ChatScreen = ({route}) => {
                 title="No"
                 MX={10}
                 onPress={() => {
-                  onDelete(props?.currentMessage?.id);
+                  onDelete({messageId: props?.currentMessage?.id, chatId});
                 }}
               />
             </AppView>
@@ -398,31 +423,14 @@ export const ChatScreen = ({route}) => {
           currentUser.uid === props.currentMessage?.user?.id && (
             <View
               style={{
-                maxWidth: '60%',
+                maxWidth: '80%',
                 overflow: 'visible',
-                marginVertical: 20,
+                // marginVertical: height * 0.004,
+                marginBottom: props.currentMessage?.isLast
+                  ? height * 0.025
+                  : height * 0.004,
                 marginLeft: 20,
                 alignSelf: 'flex-start',
-              }}>
-              <View style={styles.responseBox}>
-                <Text style={styles.response}>
-                  {' '}
-                  {props.currentMessage.text}
-                </Text>
-              </View>
-
-              <View style={styles.triangleRight} />
-            </View>
-          )}
-        {props?.currentMessage?.type === 'chat' &&
-          currentUser.uid !== props.currentMessage?.user?.id && (
-            <View
-              style={{
-                maxWidth: '60%',
-                marginVertical: 20,
-                overflow: 'visible',
-                marginRight: 20,
-                alignSelf: 'flex-end',
               }}>
               <View
                 style={[styles.responseBox, {backgroundColor: Colors.boxbg}]}>
@@ -430,185 +438,76 @@ export const ChatScreen = ({route}) => {
                   {props.currentMessage.text}
                 </Text>
               </View>
-
-              <View style={[styles.triangleRight1]} />
+              {props.currentMessage?.isLast && (
+                <View style={styles.triangleRight} />
+              )}
             </View>
           )}
-      </>
+        {props?.currentMessage?.type === 'chat' &&
+          currentUser.uid !== props.currentMessage?.user?.id && (
+            <View
+              style={{
+                maxWidth: '80%',
+                // marginTop: height * 0.004,
+                overflow: 'visible',
+                marginRight: 20,
+                alignSelf: 'flex-end',
+                marginBottom: props.currentMessage?.isLast
+                  ? height * 0.025
+                  : height * 0.004,
+              }}>
+              <View style={[styles.responseBox]}>
+                <Text style={[styles.response]}>
+                  {props.currentMessage.text}
+                </Text>
+              </View>
+              {props.currentMessage?.isLast && (
+                <View style={[styles.triangleRight1]} />
+              )}
+            </View>
+          )}
+      </View>
     );
   };
+
   if (isLoading) {
     return (
-      <AppView FullRowCenter>
-        <ActivityIndicator />
-      </AppView>
+      <View style={{flex: 1, justifyContent: 'center'}}>
+        <ActivityIndicator color={Colors.textSecondary} size={50} />
+      </View>
     );
   }
+
+  const renderChatFooter = () => <View style={styles.chatFooter} />;
+
+  // console.log(messages);
   return (
-    <FlexSafeView>
+    <FlexSafeView PT={isIOS ? 0 : 20} PB={height * 0.04}>
       <AppView activeOpacity={1} PX={20} BG="transparent" RowSpacBtw>
         <View style={styles.header}>
           <TouchableOpacity onPress={goBack} style={styles.backButton}>
-            <AppImage source={ImgSrc.backicon} SIZE={20} BG="transparent" />
+            <LessBackIcon size={20} />
           </TouchableOpacity>
           <AppImage ML={30} source={{uri: user?.image}} SIZE={45} BOR={50} />
           <Text style={styles.username}>{user?.displayName}</Text>
         </View>
-        <Image source={ImgSrc.threeDots} style={{width: 3}} />
+        <AppView PB={'4%'}>
+          <ThreeDotIcon size={20} />
+        </AppView>
       </AppView>
       <GiftedChat
+        textInputRef={ref}
         messages={messages}
         onSend={text => {
           onSend(text);
         }}
-        // renderBubble={renderBubble}
+        // renderChatFooter={renderChatFooter}
         renderInputToolbar={renderInputToolbar}
         renderMessage={renderMessage}
+        onInputTextChanged={handleTextChange}
         renderSend={renderSend}
         renderComposer={renderComposer}
       />
-
-      {/* <GiftedChat
-        messages={messages}
-        onSend={messages => onSend(messages)}
-        renderCustomView={i => {
-          console.log(i.currentMessage.text);
-        }}
-        user={{
-          _id: currentUser.uid,
-          name: currentUser.displayName,
-          avatar: currentUser.photoURL,
-        }}
-      /> */}
-
-      {/* <AppView activeOpacity={1} PX={20} PT={15} BG="transparent" RowSpacBtw>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={goBack} style={styles.backButton}>
-            <AppImage source={ImgSrc.backicon} SIZE={20} BG="transparent" />
-          </TouchableOpacity>
-          <AppImage ML={30} source={{uri: ImgSrc.girl}} SIZE={45} BOR={50} />
-          <Text style={styles.username}>Kendall</Text>
-        </View>
-        <Image source={ImgSrc.threeDots} style={{width: 3}} />
-      </AppView>
-
-      <ScrollView
-        contentContainerStyle={{paddingBottom: 150}}
-        style={styles.container}>
-        <View style={styles.messageContainer}>
-          <View style={styles.messageBubble}>
-            <Text style={styles.messageText}>
-              If you stood on Mars in normal clothes, your blood would start to
-              boil and you would die.
-            </Text>
-            <Text style={styles.promptText}>Liked your prompt</Text>
-
-            {isComments && (
-              <View style={{width: '80%', marginBottom: 20}}>
-                <View style={styles.responseBox}>
-                  <Text style={styles.response}>Whoa that's so cool!</Text>
-                </View>
-
-                <View style={styles.triangleRight} />
-              </View>
-            )}
-          </View>
-          <Text style={styles.matchText}>You matched with Kendall!</Text>
-          {isComments ? (
-            <View style={styles.questionContainer}>
-              <Text style={styles.questionText}>
-                What are your top 5 travel destinations?
-              </Text>
-              <TouchableOpacity style={styles.changeButton}>
-                <AppImage source={ImgSrc.reload} />
-                <Text style={styles.changeButtonText}>Change</Text>
-              </TouchableOpacity>
-              <AbsoluteView B={10} R={10}>
-                <AppView FullRowCenter>
-                  <AppImage SIZE={14} MX={5} source={ImgSrc.stop} />
-                  <AppText F_SIZE={13} C={Colors.background}>
-                    End{' '}
-                  </AppText>
-                </AppView>
-              </AbsoluteView>
-            </View>
-          ) : (
-            <View style={styles.questionContainer}>
-              <Text style={styles.questionText}>Start with a question? </Text>
-
-              <AppView MT={20} FullRowCenter>
-                <AppButton
-                  BG="transparent"
-                  BOW={1}
-                  C={Colors.background}
-                  title="Yes"
-                  F_SIZE={15}
-                  PY={5}
-                  PX={25}
-                  MX={10}
-                />
-
-                <AppButton
-                  BG="transparent"
-                  BOW={1}
-                  F_SIZE={15}
-                  PY={5}
-                  PX={25}
-                  C={Colors.background}
-                  title="No"
-                  MX={10}
-                />
-              </AppView>
-            </View>
-          )}
-          <View
-            style={{
-              width: '60%',
-              overflow: 'visible',
-              marginLeft: 20,
-            }}>
-            <View style={styles.responseBox}>
-              <Text style={styles.response}>I know right. So random</Text>
-            </View>
-
-            <View style={styles.triangleRight} />
-          </View>
-          <View
-            style={{
-              width: '60%',
-              marginVertical: 20,
-              overflow: 'visible',
-              marginRight: 20,
-              alignSelf: 'flex-end',
-            }}>
-            <View style={[styles.responseBox, {backgroundColor: Colors.boxbg}]}>
-              <Text style={[styles.response, {color: Colors.textPrimary}]}>
-                Haha which college are you in?
-              </Text>
-            </View>
-
-            <View style={[styles.triangleRight1]} />
-          </View>
-        </View>
-      </ScrollView>
-
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingHorizontal: 20,
-          paddingVertical: 20,
-        }}>
-        <TextInput
-          style={styles.input}
-          placeholder="Message..."
-          placeholderTextColor="#888"
-        />
-        <AppView W={58} H={52} BG={Colors.background} BOR={16} FullColumnCenter>
-          <AppImage SIZE={30} source={ImgSrc.message} />
-        </AppView>
-      </View> */}
     </FlexSafeView>
   );
 };
@@ -619,11 +518,17 @@ const styles = StyleSheet.create({
     // backgroundColor: '#1a1a1a',
     padding: 16,
   },
+  chatFooter: {
+    height: 80, // Adjust the height as needed to create space
+    backgroundColor: 'transparent',
+  },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
   },
+
   profileImage: {
     width: 40,
     height: 40,
@@ -668,14 +573,15 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES[17],
     textAlign: 'center',
     marginVertical: 30,
+    fontFamily: Fonts.secondary,
   },
   questionContainer: {
     backgroundColor: Colors.textSecondary,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingHorizontal: 30,
     paddingVertical: 30,
 
-    marginBottom: 20,
+    marginVertical: 20,
     flexDirection: 'column',
     justifyContent: 'space-between',
     alignSelf: 'center',
@@ -695,7 +601,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '60%',
     height: 50,
-
     marginTop: 20,
     borderWidth: 1,
     alignSelf: 'center',
@@ -712,13 +617,11 @@ const styles = StyleSheet.create({
     // padding: 12,
     paddingHorizontal: 10,
     borderTopWidth: 0, // Hide the top border
-
-    color: '#fff',
+    width: '100%',
     // marginTop: 16,
-    width: '90%',
     fontFamily: Fonts.secondary,
     position: 'relative',
-    height: height * 0.06,
+    height: width * 0.125,
     alignItems: 'center',
     textAlignVertical: 'center',
     justifyContent: 'center',
@@ -734,7 +637,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 30,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderBottomColor: colors.responseBackground,
+    borderBottomColor: Colors.boxbg,
+
     transform: [{rotate: '110deg'}],
     position: 'absolute',
     bottom: -13,
@@ -750,7 +654,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 30,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderBottomColor: Colors.boxbg,
+    borderBottomColor: colors.responseBackground,
     transform: [{rotate: '20deg'}],
     position: 'absolute',
     bottom: -6,
@@ -760,11 +664,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.responseBackground,
     borderRadius: 15,
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingVertical: height * 0.016,
   },
   response: {
     color: colors.responseText,
-    fontSize: FONT_SIZES[16],
+    fontSize: FONT_SIZES[16] + 1,
     fontFamily: Fonts.secondary,
   },
 });

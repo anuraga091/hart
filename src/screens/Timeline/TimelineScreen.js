@@ -10,9 +10,12 @@ import {
 } from 'react-native-quick-components';
 import {useNavigation} from '@react-navigation/native';
 import {firebase} from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import {Fonts, height} from '../../utils/styles/fontsSizes';
+import {LessBackIcon, TickIcon} from '../../utils/assetComp/IconComp';
 
 export const TimelineScreen = () => {
-  const {navigate} = useNavigation();
+  const {navigate, reset} = useNavigation();
   const [users, setUsers] = useState([]);
   const currentUser = firebase.auth().currentUser;
   useEffect(() => {
@@ -166,7 +169,6 @@ export const TimelineScreen = () => {
   };
 
   async function fetchQuestions() {
-    console.log('first');
     try {
       // const documentSnapshot = await firebase
       //   .firestore()
@@ -206,12 +208,11 @@ export const TimelineScreen = () => {
   useEffect(() => {
     fetchQuestions();
   }, []);
-
   const renderItem = ({item, index}) => (
     <TouchableOpacity
       key={index}
       style={{
-        backgroundColor: '#9d4146ff',
+        backgroundColor: '#9d46ff91',
         marginVertical: 5,
         padding: 10,
         marginHorizontal: 20,
@@ -220,42 +221,46 @@ export const TimelineScreen = () => {
       onPress={() => handleUserPress(item)}>
       <AppView disabled style={{flexDirection: 'row', alignItems: 'center'}}>
         <AppImage source={{uri: item?.image}} BOR={50} SIZE={60} />
-        <Text style={{color: 'white', fontSize: 30, marginLeft: 20}}>
-          {item.displayName}
+        <Text
+          style={{
+            color: 'white',
+            fontSize: 22,
+            marginLeft: 20,
+            fontFamily: Fonts.bold,
+          }}>
+          {item?.displayName}
         </Text>
       </AppView>
-      <Text style={{color: 'white', fontSize: 10}}>{item?.message}</Text>
+      <Text style={{color: 'white', fontSize: 10, fontFamily: Fonts.bold}}>
+        {item?.message}
+      </Text>
     </TouchableOpacity>
   );
 
   return (
     <FlexSafeView>
+      {/* <TickIcon />
+      <LessBackIcon /> */}
+
       <FlatList
         data={users}
         keyExtractor={item => item.id}
         renderItem={renderItem}
       />
-
-      {/* <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <AppButton
-          title="With Comments"
-          center
-          onPress={() => {
-            navigate('LikedScreen', {isComments: true});
-          }}
-        />
-        <AppButton
-          MY={40}
-          onPress={() => {
-            navigate('LikedScreen', {isComments: false});
-          }}
-          title="Without Comments"
-        />
-      </View> */}
+      <AppButton
+        title="Logout"
+        W={'90%'}
+        FONT={Fonts.bold}
+        center
+        H={60}
+        onPress={() => {
+          auth().signOut();
+          reset({
+            index: 0,
+            routes: [{name: 'Login'}],
+          });
+        }}
+      />
     </FlexSafeView>
   );
 };

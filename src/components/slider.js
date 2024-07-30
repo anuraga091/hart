@@ -8,15 +8,16 @@ import {
 } from 'react-native';
 // import {AntDesign} from '@expo/vector-icons';
 import {colors, Colors} from '../utils/styles/colors';
-import {ImgSrc} from '../utils/ImgSrc';
+import {ImgSrc} from '../utils/assetComp/ImgSrc';
 import {AppImage} from 'react-native-quick-components';
 import {useNavigation} from '@react-navigation/native';
-import {Fonts} from '../utils/styles/fontsSizes';
+import {Fonts, height} from '../utils/styles/fontsSizes';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import {SlideArrowIcon} from '../utils/assetComp/IconComp';
 
 const {width} = Dimensions.get('window');
 const lockWidth = width * 0.9;
-const lockHeight = 70;
+const lockHeight = Math.floor(width * 0.15);
 const smallgap = 6;
 const finalPosition = lockWidth - lockHeight;
 
@@ -69,13 +70,14 @@ export default function SwipeUnlock({user}) {
       bounciness: 0,
     }).start();
     setTimeout(() => {
-      reset();
       ReactNativeHapticFeedback.trigger('impactHeavy', {
         enableVibrateFallback: true,
         ignoreAndroidSystemSettings: true,
       });
+      reset();
+
       navigation.navigate('Chat', {user});
-    }, 300);
+    }, 100);
   };
   return (
     <View style={styles.container}>
@@ -93,8 +95,7 @@ export default function SwipeUnlock({user}) {
         <Animated.View
           style={[styles.bar, {transform: [{translateX: translateBtn}]}]}
           {...panResponder.panHandlers}>
-          {/* <AntDesign name="right" size={24} color="black" /> */}
-          <AppImage source={ImgSrc.proccedarrowe} BG="transparent" SIZE={60} />
+          <SlideArrowIcon size={Math.floor(width * 0.125)} />
         </Animated.View>
       </View>
     </View>

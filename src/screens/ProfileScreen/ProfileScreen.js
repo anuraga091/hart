@@ -17,13 +17,13 @@ import {
   padding,
   width,
 } from '../../utils/styles/fontsSizes';
-import {ImgSrc} from '../../utils/ImgSrc';
+import {ImgSrc} from '../../utils/assetComp/ImgSrc';
 import SwipeUnlock from '../../components/slider';
+import {LikeButtonIcon, PinIcon} from '../../utils/assetComp/IconComp';
 
-export const ProfileScreen = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
+export const ProfileScreen = ({route}) => {
+  const {user} = route.params;
+
   return (
     <FlexView>
       <ScrollView>
@@ -33,13 +33,13 @@ export const ProfileScreen = () => {
           style={styles.container}>
           <View style={styles.profileCard}>
             <View style={styles.shadow}>
-              <Text style={styles.name}>Eshan</Text>
+              <Text style={styles.name}>{user?.displayName}</Text>
 
               <View style={styles.imageshadow}>
-                <Image source={ImgSrc.profile2} style={styles.image} />
+                <Image source={{uri: user?.image}} style={styles.image} />
               </View>
               <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-                <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+                <LikeButtonIcon size={width * 0.16} />
               </AbsoluteView>
             </View>
           </View>
@@ -53,7 +53,7 @@ export const ProfileScreen = () => {
                 to boil and you would die.
               </Text>
               <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-                <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+                <LikeButtonIcon size={width * 0.16} />
               </AbsoluteView>
             </View>
           </View>
@@ -63,7 +63,7 @@ export const ProfileScreen = () => {
             <View style={styles.separator1} />
             <AppText style={styles.text1}>Male</AppText>
             <View style={styles.separator1} />
-            <Image source={ImgSrc.locationPin} />
+            <PinIcon size={fontSizes.xsmall} />
             <AppText style={styles.text1}>Hulimavu</AppText>
             <View style={styles.separator1} />
             <AppText style={styles.text1}>5'7</AppText>
@@ -87,7 +87,7 @@ export const ProfileScreen = () => {
               style={[styles.image, {width: '100%', height: height * 0.4}]}
             />
             <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-              <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+              <LikeButtonIcon size={width * 0.16} />
             </AbsoluteView>
           </View>
 
@@ -101,7 +101,7 @@ export const ProfileScreen = () => {
                 This town called ‘Sardina’ in Italy!
               </Text>
               <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-                <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+                <LikeButtonIcon size={width * 0.16} />
               </AbsoluteView>
             </View>
           </View>
@@ -123,7 +123,7 @@ export const ProfileScreen = () => {
               source={ImgSrc.profile3}
             />
             <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-              <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+              <LikeButtonIcon size={width * 0.16} />
             </AbsoluteView>
           </View>
 
@@ -135,7 +135,7 @@ export const ProfileScreen = () => {
                 Going to a restuarant and catching the girl’s dad spying on us
               </Text>
               <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-                <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+                <LikeButtonIcon size={width * 0.16} />
               </AbsoluteView>
             </View>
           </View>
@@ -156,12 +156,12 @@ export const ProfileScreen = () => {
               style={[styles.image, {width: '100%', height: height * 0.4}]}
             />
             <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
-              <Image source={ImgSrc.likeButton} style={styles.likeIcon} />
+              <LikeButtonIcon size={width * 0.16} />
             </AbsoluteView>
           </View>
         </ImageBackground>
 
-        <SwipeUnlock />
+        <SwipeUnlock user={user} />
       </ScrollView>
     </FlexView>
   );
