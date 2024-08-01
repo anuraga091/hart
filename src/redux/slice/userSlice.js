@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 
 export const userSlice = createSlice({
   name: 'user',
@@ -17,6 +17,6 @@ export const userSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setAuthentication, setOnboardingCompletion } = userSlice.actions;
+export const {setAuthentication, setOnboardingCompletion} = userSlice.actions;
 
 export default userSlice.reducer;

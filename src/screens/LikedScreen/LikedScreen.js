@@ -29,7 +29,7 @@ import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import {AppButton} from 'react-native-quick-components';
 
 export const LikedScreen = ({route}) => {
-  const {user} = route.params;
+  const {user} = route?.params;
   const [isOpen, setIsOpen] = useState(false);
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);

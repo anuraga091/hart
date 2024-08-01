@@ -20,7 +20,6 @@ import {store, persistor} from './src/redux/store';
 import {setAuthentication} from './src/redux/slice/userSlice';
 import AboutUser from './src/screens/AboutUser';
 import {ChatScreen} from './src/screens/ChatScreen/Chat';
-import Likes from './src/screens/Likes';
 import ViewUserScreen from './src/screens/ViewUserScreen';
 import {ProfileScreen} from './src/screens/ProfileScreen/ProfileScreen';
 import {init} from 'react-native-quick-components';
@@ -30,7 +29,12 @@ import {ImgSrc} from './src/utils/assetComp/ImgSrc';
 import {Colors, colors} from './src/utils/styles/colors';
 import {TimelineScreen} from './src/screens/Timeline/TimelineScreen';
 import auth from '@react-native-firebase/auth';
+import {EditProfileScreen} from './src/screens/MyProfile/EditProfileScreen';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {enableLayoutAnimations} from 'react-native-reanimated';
+import {CreditScreen} from './src/screens/CreditScreen/CreditScreen';
 
+enableLayoutAnimations(true);
 init({
   defaultBackgroundColor: 'transparent',
   defaultTextColor: 'rgba(255, 255, 255, 0.85)',
@@ -74,7 +78,7 @@ const AppWrapper = () => {
       style={{flex: 1, backgroundColor: colors.background}}>
       <NavigationContainer style={{backgroundColor: 'transparent'}}>
         <Stack.Navigator
-          initialRouteName={initialRouteName}
+          initialRouteName={'About-User'}
           screenOptions={{
             headerShown: false,
             contentStyle: {backgroundColor: 'transparent'},
@@ -89,11 +93,15 @@ const AppWrapper = () => {
           <Stack.Screen name="About-1" component={About1} />
           <Stack.Screen name="About-2" component={About2} />
           <Stack.Screen name="Homepage" component={Homepage} />
-          <Stack.Screen name="Like" component={Likes} />
           <Stack.Screen name="LikedScreen" component={LikedScreen} />
           <Stack.Screen name="Chat" component={ChatScreen} />
           <Stack.Screen name="About-User" component={AboutUser} />
           <Stack.Screen name="ViewProfile" component={ViewUserScreen} />
+          <Stack.Screen name="CreditScreen" component={CreditScreen} />
+          <Stack.Screen
+            name="EditProfileScreen"
+            component={EditProfileScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </ImageBackground>

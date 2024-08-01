@@ -11,6 +11,7 @@ const moderateScale = (size, factor = 0.5) =>
 // src/styles/fonts.js
 export const Fonts = {
   primary: 'LibreBaskerville-Bold',
+  LibreBaskervilleBold: 'LibreBaskerville-Bold',
   secondary: 'Raleway-SemiBold',
   RalewayBold: 'Raleway-Bold',
   RalewayRegular: 'Raleway-Medium',
