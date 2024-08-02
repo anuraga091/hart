@@ -33,6 +33,7 @@ import {EditProfileScreen} from './src/screens/MyProfile/EditProfileScreen';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {enableLayoutAnimations} from 'react-native-reanimated';
 import {CreditScreen} from './src/screens/CreditScreen/CreditScreen';
+import {ComingSoon} from './src/screens/ComingSoon/ComingSoon';
 
 enableLayoutAnimations(true);
 init({
@@ -84,6 +85,7 @@ const AppWrapper = () => {
             contentStyle: {backgroundColor: 'transparent'},
           }}>
           <Stack.Screen name="IntroPage1" component={IntroPage1} />
+          <Stack.Screen name="ComingSoon" component={ComingSoon} />
           <Stack.Screen name="TimelineScreen" component={TimelineScreen} />
           <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
           <Stack.Screen name="Login" component={Login} />

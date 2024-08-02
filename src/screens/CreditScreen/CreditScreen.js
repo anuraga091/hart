@@ -58,7 +58,9 @@ const styles = StyleSheet.create({
     color: Colors.white,
     opacity: 0.6,
     fontFamily: Fonts.RalewayRegular,
-    fontSize: FONT_SIZES[15],
+    fontSize: FONT_SIZES[16],
+    // transform: [{scale: 1.04}],
+
     lineHeight: FONT_SIZES[23],
     letterSpacing: 1.1, // Adjust the value as needed
   },

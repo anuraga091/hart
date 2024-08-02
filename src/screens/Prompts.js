@@ -200,7 +200,7 @@ const Prompts = ({addBasicDetail, all_detail}) => {
                   styles.prompts,
                   i?.selected
                     ? {borderWidth: 1, borderColor: Colors.textSecondary}
-                    : {},
+                    : {paddingVertical: '8.5%'},
                 ]}>
                 <Text style={styles.promptText}>{i.prompt}</Text>
                 {i.selected && (
@@ -255,7 +255,8 @@ const Prompts = ({addBasicDetail, all_detail}) => {
               <TextInput
                 onChangeText={setQuestion}
                 style={styles.optionText1}
-                placeholderTextColor={'#797979'}
+                multiline
+                placeholderTextColor={'#A09D9D'}
                 placeholder="Type here ..."
                 value={question}
               />
@@ -314,25 +315,27 @@ const styles = StyleSheet.create({
     width: '85%',
     height: '35%',
     backgroundColor: Colors.boxbg1,
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 10,
-    justifyContent: 'center',
+    paddingTop: '10%',
+    // justifyContent: 'center',
     paddingHorizontal: 25,
     borderColor: Colors.dark,
-    borderWidth: 1,
+    borderWidth: 1.2,
     alignSelf: 'center',
   },
   optionText: {
-    color: Colors.buttonBackground,
+    color: Colors.white,
     fontSize: FONT_SIZES[24],
     // marginVertical: 10,
     fontFamily: Fonts.primary,
   },
   optionText1: {
-    color: Colors.white,
+    color: '#A09D9D',
     fontSize: FONT_SIZES[18],
     // marginVertical: 20,
     fontFamily: Fonts.LibreBaskervilleBold,
+    maxHeight: '80%',
   },
   text1: {
     marginTop: 18,
@@ -401,15 +404,15 @@ const styles = StyleSheet.create({
   promptText: {
     color: '#FFF',
     fontFamily: Fonts.secondary,
-    fontSize: FONT_SIZES[17],
+    fontSize: FONT_SIZES[18],
     textAlign: 'center',
     //paddingTop: 5,
   },
   promptTextAnswer: {
     color: 'rgba(255,255,255,0.6)',
     fontFamily: 'Raleway-SemiBold',
-    fontSize: FONT_SIZES[14],
-    //paddingTop: 5,
+    fontSize: FONT_SIZES[15],
+    paddingTop: '2%',
     textAlign: 'center',
   },
   tickView: {

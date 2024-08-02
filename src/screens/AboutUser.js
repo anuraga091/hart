@@ -324,7 +324,8 @@ const AboutUser = ({
 
             <View style={styles.settingsSection}>
               <TouchableOpacity
-                /*onPress={handleVerifyAccount}*/ style={styles.comingSoonItem}>
+                onPress={() => navigation.navigate('ComingSoon')}
+                style={styles.comingSoonItem}>
                 <Text style={styles.comingSoonTitle}>Coming Soon</Text>
                 <StarIcon size={38} />
               </TouchableOpacity>
@@ -486,6 +487,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    alignItems: 'center',
   },
   settingsTitle: {
     color: Colors.textPrimary,

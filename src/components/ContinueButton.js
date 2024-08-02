@@ -34,11 +34,12 @@ const ContinueButton = ({onPress, isLoading = false}) => {
 const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 30,
-    height: 50,
-    width: 170,
+    height: 52,
+    width: '48%',
     justifyContent: 'space-evenly',
     flexDirection: 'row',
     shadowColor: 'rgba(0, 0, 0, 0.6)',
+    paddingHorizontal: '4%',
     shadowOffset: {
       width: 1.5,
       height: 2,
