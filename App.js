@@ -79,7 +79,7 @@ const AppWrapper = () => {
       style={{flex: 1, backgroundColor: colors.background}}>
       <NavigationContainer style={{backgroundColor: 'transparent'}}>
         <Stack.Navigator
-          initialRouteName={'About-User'}
+          initialRouteName={initialRouteName}
           screenOptions={{
             headerShown: false,
             contentStyle: {backgroundColor: 'transparent'},
