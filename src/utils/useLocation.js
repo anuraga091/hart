@@ -1,6 +1,7 @@
 // LocationService.js
+import {Platform} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 const requestLocationPermission = async () => {
   let permission;
@@ -25,10 +26,9 @@ const getLocation = async (onSuccess, onError) => {
     Geolocation.getCurrentPosition(
       position => onSuccess(position),
       error => onError(error),
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
     );
   }
 };
 
-export { getLocation };
-
+export {getLocation};

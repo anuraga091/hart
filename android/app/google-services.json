@@ -1,37 +1,27 @@
 {
   "project_info": {
-    "project_number": "179444331073",
-    "firebase_url": "https://hart-dating-app-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "hart-dating-app",
-    "storage_bucket": "hart-dating-app.appspot.com"
+    "project_number": "808180923750",
+    "firebase_url": "https://realate-dating-default-rtdb.firebaseio.com",
+    "project_id": "realate-dating",
+    "storage_bucket": "realate-dating.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:179444331073:android:aeb7b8a714d274f99a0cc0",
+        "mobilesdk_app_id": "1:808180923750:android:70e37a4e492dfa3e715ca7",
         "android_client_info": {
           "package_name": "com.realate"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "179444331073-0our82t9hhv234kb40e1gb5j81c27f3l.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA0qJk2sCvs406qG7A8kT8xKSiSmrE9i5k"
+          "current_key": "AIzaSyAfLzLH-8HoZjd_CJvpa9sFPOeSvMFgVqQ"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "179444331073-0our82t9hhv234kb40e1gb5j81c27f3l.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
