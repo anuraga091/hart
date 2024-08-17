@@ -30,6 +30,8 @@ import {ImgSrc} from '../utils/assetComp/ImgSrc';
 import {AppView} from 'react-native-quick-components';
 import {FONT_SIZES, Fonts} from '../utils/styles/fontsSizes';
 import {Colors} from '../utils/styles/colors';
+import axios from 'axios';
+import urls from '../utils/urls';
 
 const AboutUser = ({
   data,

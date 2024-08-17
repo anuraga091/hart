@@ -2,6 +2,8 @@ import {StyleSheet, View, Image, Text, Pressable} from 'react-native';
 import React, {useEffect} from 'react';
 import {Color, FontFamily} from '../GlobalStyles';
 import {useSelector} from 'react-redux';
+import {AppLogoIcon} from '../utils/assetComp/IconComp';
+import {width} from '../utils/styles/fontsSizes';
 
 const IntroPage1 = ({navigation}) => {
   const {isAuthenticated, hasCompletedOnboarding} = useSelector(
@@ -22,11 +24,12 @@ const IntroPage1 = ({navigation}) => {
 
   return (
     <View style={styles.introPage1}>
-      <Image
+      {/* <Image
         style={styles.info1}
         resizeMode="cover"
         source={require('../../assets/realate-icon.png')}
-      />
+      /> */}
+      <AppLogoIcon w={width * 0.8} h={76} />
       <Image
         style={[styles.background1, styles.background11]}
         resizeMode="cover"
@@ -39,8 +42,10 @@ const IntroPage1 = ({navigation}) => {
       />
 
       <Text style={[styles.text2Container, styles.containerPosition]}>
-        <Text style={styles.yellow1}>Dating</Text>
-        <Text style={styles.white1}>{` for the real ones. `}</Text>
+        <Text style={styles.white1}>{`Where `}</Text>
+
+        <Text style={styles.yellow1}>the crowd</Text>
+        <Text style={styles.white1}>{` actually matters. `}</Text>
       </Text>
 
       {/* <Text style={[styles.text1Container, styles.containerPosition]}>

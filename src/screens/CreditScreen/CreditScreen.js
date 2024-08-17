@@ -15,8 +15,7 @@ export const CreditScreen = () => {
         <Text style={styles.title}>I’m grateful for</Text>
         <Text style={styles.message}>
           Parth, Juhi, Faraaz, Anurag, Anushka, Poojitha, Sakshi, Anant, Ronit,
-          Dhruv, Narayani, Shagun, Mumma, Baba and the countless others who
-          believed in me.
+          Dhruv, Narayani, Shagun, and the countless others who believed in me.
         </Text>
         <Text style={[styles.message, {marginTop: '6%'}]}>
           Realate would be just an idea without your support - through late

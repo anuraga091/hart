@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {Provider} from 'react-redux';
+import {Provider, useDispatch, useSelector} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -35,6 +35,16 @@ import notifee, {
   AndroidImportance,
   AndroidVisibility,
 } from '@notifee/react-native';
+import {addBasicDetail} from './src/redux/reducer/basicDetailsSlice';
+import {
+  setAuthentication,
+  setOnboardingCompletion,
+} from './src/redux/slice/userSlice';
+import {getLocation} from './src/utils/useLocation';
+import {getAuth, onAuthStateChanged} from '@react-native-firebase/auth';
+import axios from 'axios';
+import urls from './src/utils/urls';
+
 enableLayoutAnimations(true);
 init({
   defaultBackgroundColor: 'transparent',
@@ -45,83 +55,92 @@ init({
 const Stack = createNativeStackNavigator();
 // eibAfnWGSGOlqI-U8pcTIi:APA91bHVXh0aKbWTS5wYfQEpUh844vjpOjzJccrV1HMcE7_Eg6ObNoqe_fVtAuHSXCMTa0lFIic18vjsIVf7iqzbwZkJ43g7c_azQmdkpNwpdA1Sf10gbc3rT2a4ZcdZJNOiSFYWA_fL
 const AppWrapper = () => {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
-
-  // Handle user state changes
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
-  async function requestUserPermission() {
-    const authStatus = await messaging().requestPermission();
-    await notifee.requestPermission();
-
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-    if (enabled) {
-      console.log('Authorization status:', authStatus);
-      getDeviceToken();
-    }
-  }
-
-  const getDeviceToken = async () => {
-    await messaging().registerDeviceForRemoteMessages();
-    const token = await messaging().getToken();
-    console.log(token);
-  };
+  const {isAuthenticated, hasCompletedOnboarding} = useSelector(
+    state => state.user,
+  );
+  const details = useSelector(state => state.basicDetails);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    requestUserPermission();
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
-  }, []);
+    const auth = getAuth();
 
-  useEffect(() => {
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      // Alert.alert('A  new FCM message arrived!', JSON.stringify(remoteMessage));
-      const channelId = await notifee.createChannel({
-        id: 'default',
-        name: 'Default Channel',
-        importance: AndroidImportance.HIGH, // Ensure HIGH importance
-        visibility: AndroidVisibility.PUBLIC,
-      });
+    const unsubscribe = onAuthStateChanged(auth, async user => {
+      setLoading(true);
+      if (user) {
+        const idToken = await user.getIdToken();
 
-      // Display a notification
-      notifee.displayNotification({
-        title: `<p style="color: #000000;"><b>${remoteMessage.notification?.title}</span></p></b></p>`,
-        android: {
-          channelId,
-          color: '#F1DEAC',
-          sound: 'default',
-          smallIcon: 'ic_notification',
-          // smallIcon: 'logo',
-          // largeIcon: 'logo',
-          // importance: AndroidImportance.HIGH,
-          // asForegroundService: true,
-          // category: AndroidCategory.RECOMMENDATION
-        },
-      });
+        getLocation(
+          position => {
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            const altitude = position.coords.altitude;
+            const accuracy = position.coords.accuracy;
+            const location = {
+              lat: lat,
+              long: long,
+              altitude: altitude,
+              accuracy: accuracy,
+            };
+            axios
+              .post(
+                `${urls.PROD_URL}/user/location`,
+                {
+                  firebaseUid: user.uid,
+                  location: location,
+                  // Add any other relevant information
+                },
+                {
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${idToken}`,
+                  },
+                },
+              )
+              .then(res => {
+                // Handle response
+                console.log('Location updated', res.data);
+              })
+              .catch(err => {
+                console.log('Failed to update location', err);
+              });
+          },
+          error => {
+            setError(error.message);
+          },
+        );
+        await axios
+          .get(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user/${user.uid}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${idToken}`,
+            },
+          })
+          .then(res => {
+            const {hasCompletedOnboarding, ...restData} = res.data;
+            dispatch(addBasicDetail(restData));
+            dispatch(setOnboardingCompletion(res.data.hasCompletedOnboarding));
+            setLoading(false);
+          })
+          .catch(err => {
+            console.log('No user Found', err);
+            setLoading(false);
+          });
+        dispatch(setAuthentication(true));
+      } else {
+        dispatch(setAuthentication(false));
+      }
+      setLoading(false);
     });
 
-    return unsubscribe;
-  }, []);
+    return () => unsubscribe();
+  }, [dispatch]);
 
-  // if (initializing) return null;
-  // console.log(user);
-  if (initializing) {
-    return (
-      <View style={{flex: 1, justifyContent: 'center'}}>
-        <ActivityIndicator size={50} color={Colors.textSecondary} />
-      </View>
-    );
-  }
-
-  const initialRouteName = user ? 'TimelineScreen' : 'Login';
-
+  const initialRouteName = isAuthenticated
+    ? hasCompletedOnboarding
+      ? 'Homepage'
+      : 'Details'
+    : 'IntroPage1';
   return (
     <ImageBackground
       source={ImgSrc.background2}

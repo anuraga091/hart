@@ -21,9 +21,15 @@ import Delete from '../../assets/svg/delete.svg';
 import LessBack from '../../assets/svg/lessback.svg';
 import Reload from '../../assets/svg/reload.svg';
 import Star from '../../assets/svg/star.svg';
+import AppLogo from '../../assets/svg/applogo.svg';
 
 import {useNavigation} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native';
+
+// Define components
+export const AppLogoIcon = ({w = 30, h = 30, size}) => (
+  <AppLogo height={size ?? h} width={size ?? w} />
+);
 
 // Define components
 export const RightarrowIcon = ({w = 30, h = 30, size}) => (
