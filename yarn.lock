@@ -2333,6 +2333,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@notifee/react-native@npm:^7.8.2":
+  version: 7.8.2
+  resolution: "@notifee/react-native@npm:7.8.2"
+  peerDependencies:
+    react-native: "*"
+  checksum: f3b3ea116653d4dc7b50f8124898f9e22567ae30306225841d2057bc9ce40d451b15436dff3e60e0e042ffd7f34338054b202cd2dc61c5dc5eab7676b625b9f9
+  languageName: node
+  linkType: hard
+
 "@npmcli/agent@npm:^2.0.0":
   version: 2.2.2
   resolution: "@npmcli/agent@npm:2.2.2"
@@ -2693,6 +2702,19 @@ __metadata:
   peerDependencies:
     "@react-native-firebase/app": 18.9.0
   checksum: c0ec9349051560822157beb2af3a401beb874fa59e9a2eb2e44b78dc31f500c7a88425cca445dd7010a3a3b036b94565b1468b7ab5e40130ed5392b11b95289e
+  languageName: node
+  linkType: hard
+
+"@react-native-firebase/messaging@npm:^18.5.0":
+  version: 18.9.0
+  resolution: "@react-native-firebase/messaging@npm:18.9.0"
+  peerDependencies:
+    "@react-native-firebase/app": 18.9.0
+    expo: ">=47.0.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 3e819af95a1cbc908c37a95f1bb1a33810466b0b100adeb97ac504e74d6840248ace0a110e5d33f5a14383b1790809200b808dab6b2749f3eac996a779de781a
   languageName: node
   linkType: hard
 
@@ -11608,12 +11630,14 @@ __metadata:
     "@babel/core": ^7.20.0
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@notifee/react-native": ^7.8.2
     "@react-native-async-storage/async-storage": ^1.19.3
     "@react-native-community/blur": ^4.3.2
     "@react-native-community/datetimepicker": ^7.6.0
     "@react-native-firebase/app": ^18.5.0
     "@react-native-firebase/auth": ^18.5.0
     "@react-native-firebase/firestore": ^18.5.0
+    "@react-native-firebase/messaging": ^18.5.0
     "@react-native-picker/picker": ^2.5.1
     "@react-native/eslint-config": ^0.72.2
     "@react-native/metro-config": ^0.72.11

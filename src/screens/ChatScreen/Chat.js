@@ -17,6 +17,7 @@ import {
   ActivityIndicator,
   Animated,
   Vibration,
+  AppState,
 } from 'react-native';
 import {
   FONT_SIZES,
@@ -45,10 +46,12 @@ import {
   StopIcon,
   ThreeDotIcon,
 } from '../../utils/assetComp/IconComp';
+import {sendNotification} from '../../notification/notify';
 
 export const ChatScreen = ({route}) => {
   const {goBack} = useNavigation();
   const {user} = route.params;
+  // console.log(user);
   const currentUser = firebase.auth().currentUser;
   const ref = useRef(null);
   const chatId =
@@ -63,6 +66,91 @@ export const ChatScreen = ({route}) => {
   const inputWidth = useRef(new Animated.Value(width * 0.75)).current; // initial width
   const paddLeftX = useRef(new Animated.Value(0)).current; // initial opacity
   const iconTranslateX = useRef(new Animated.Value(0)).current; // initial position
+  const [isOnline, setIsOnline] = useState(false);
+
+  const appState = useRef(AppState.currentState);
+
+  const roomStatusRef1 = firebase
+    .firestore()
+    .collection('chats')
+    .doc(chatId)
+    .collection('room-status');
+
+  useEffect(() => {
+    const userId = currentUser.uid;
+    const roomStatusRef = firebase
+      .firestore()
+      .collection('chats')
+      .doc(chatId)
+      .collection('room-status')
+      .doc(userId);
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (nextAppState !== 'active') {
+        roomStatusRef
+          .set(
+            {
+              isOnline: false,
+              id: currentUser.uid,
+              // lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+            },
+            {merge: true},
+          )
+          .catch(error => console.error('Error updating status:', error));
+      }
+    });
+
+    // Set up the initial status document
+    const setupStatus = async () => {
+      // Create the status document if it doesn't exist
+      await roomStatusRef.set(
+        {
+          isOnline: true,
+          id: currentUser.uid,
+        },
+        {merge: true},
+      );
+
+      // Listen for real-time updates
+      const unsubscribe = roomStatusRef1.onSnapshot(snapshot => {
+        const messagesFirestore = snapshot?.docs?.map(doc => {
+          const data = doc.data();
+          // console.log(data);
+          return data;
+        });
+        // Handle status change
+        // console.log(
+        //   'messagesFirestore',
+        //   messagesFirestore.filter(i => i?.id !== currentUser.uid),
+        // );
+        setIsOnline(
+          messagesFirestore.find(i => i?.id !== currentUser.uid)?.isOnline,
+        );
+      });
+
+      // Clean up function
+      return unsubscribe;
+    };
+    // Mark user as online when entering the chat room
+    setupStatus()
+      .then(() => {})
+      .catch(error => console.error('Error setting up status:', error));
+
+    // Mark user as offline when they leave or the component unmounts
+    return () => {
+      subscription.remove();
+
+      roomStatusRef
+        .set(
+          {
+            isOnline: false,
+            id: currentUser.uid,
+            // lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+          },
+          {merge: true},
+        )
+        .catch(error => console.error('Error updating status:', error));
+    };
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -138,8 +226,9 @@ export const ChatScreen = ({route}) => {
 
     return () => unsubscribe();
   }, [user]);
+  // console.log('isOnline Outside', isOnline);
 
-  const onSend = useCallback((message = []) => {
+  const onSend = useCallback(async (message = []) => {
     const {_id, text} = message[0];
     firebase
       .firestore()
@@ -153,6 +242,18 @@ export const ChatScreen = ({route}) => {
         user: user,
         type: 'chat',
       });
+
+    const d = (await roomStatusRef1.get()).docs
+      .map(i => i.data())
+      ?.find(i => i?.id !== currentUser.uid);
+
+    if (!d?.isOnline) {
+      console.log('sent message');
+      sendNotification({
+        title: ` ${user.displayName} sent a message.`,
+        fcmToken: user?.fcmToken,
+      });
+    }
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, message),
     );

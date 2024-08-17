@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {LogBox} from 'react-native';
 
-import {Provider, useDispatch, useSelector} from 'react-redux';
+import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {getAuth, onAuthStateChanged} from '@react-native-firebase/auth';
 
 // Screens and redux store imports
 import IntroPage1 from './src/screens/IntroPage1';
@@ -17,24 +15,26 @@ import About1 from './src/screens/About1';
 import About2 from './src/screens/About2';
 import Homepage from './src/screens/Homepage';
 import {store, persistor} from './src/redux/store';
-import {setAuthentication} from './src/redux/slice/userSlice';
 import AboutUser from './src/screens/AboutUser';
 import {ChatScreen} from './src/screens/ChatScreen/Chat';
 import ViewUserScreen from './src/screens/ViewUserScreen';
 import {ProfileScreen} from './src/screens/ProfileScreen/ProfileScreen';
 import {init} from 'react-native-quick-components';
 import {LikedScreen} from './src/screens/LikedScreen/LikedScreen';
-import {ActivityIndicator, ImageBackground, View} from 'react-native';
+import {ActivityIndicator, Alert, ImageBackground, View} from 'react-native';
 import {ImgSrc} from './src/utils/assetComp/ImgSrc';
 import {Colors, colors} from './src/utils/styles/colors';
 import {TimelineScreen} from './src/screens/Timeline/TimelineScreen';
 import auth from '@react-native-firebase/auth';
 import {EditProfileScreen} from './src/screens/MyProfile/EditProfileScreen';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {enableLayoutAnimations} from 'react-native-reanimated';
 import {CreditScreen} from './src/screens/CreditScreen/CreditScreen';
 import {ComingSoon} from './src/screens/ComingSoon/ComingSoon';
-
+import messaging from '@react-native-firebase/messaging';
+import notifee, {
+  AndroidImportance,
+  AndroidVisibility,
+} from '@notifee/react-native';
 enableLayoutAnimations(true);
 init({
   defaultBackgroundColor: 'transparent',
@@ -43,9 +43,8 @@ init({
 });
 
 const Stack = createNativeStackNavigator();
-
+// eibAfnWGSGOlqI-U8pcTIi:APA91bHVXh0aKbWTS5wYfQEpUh844vjpOjzJccrV1HMcE7_Eg6ObNoqe_fVtAuHSXCMTa0lFIic18vjsIVf7iqzbwZkJ43g7c_azQmdkpNwpdA1Sf10gbc3rT2a4ZcdZJNOiSFYWA_fL
 const AppWrapper = () => {
-  const [isLoggedIn, setisLoggedIn] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
@@ -55,9 +54,60 @@ const AppWrapper = () => {
     if (initializing) setInitializing(false);
   }
 
+  async function requestUserPermission() {
+    const authStatus = await messaging().requestPermission();
+    await notifee.requestPermission();
+
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+      getDeviceToken();
+    }
+  }
+
+  const getDeviceToken = async () => {
+    await messaging().registerDeviceForRemoteMessages();
+    const token = await messaging().getToken();
+    console.log(token);
+  };
+
   useEffect(() => {
+    requestUserPermission();
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      // Alert.alert('A  new FCM message arrived!', JSON.stringify(remoteMessage));
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+        importance: AndroidImportance.HIGH, // Ensure HIGH importance
+        visibility: AndroidVisibility.PUBLIC,
+      });
+
+      // Display a notification
+      notifee.displayNotification({
+        title: `<p style="color: #000000;"><b>${remoteMessage.notification?.title}</span></p></b></p>`,
+        android: {
+          channelId,
+          color: '#F1DEAC',
+          sound: 'default',
+          smallIcon: 'ic_notification',
+          // smallIcon: 'logo',
+          // largeIcon: 'logo',
+          // importance: AndroidImportance.HIGH,
+          // asForegroundService: true,
+          // category: AndroidCategory.RECOMMENDATION
+        },
+      });
+    });
+
+    return unsubscribe;
   }, []);
 
   // if (initializing) return null;
