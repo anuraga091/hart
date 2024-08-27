@@ -5,6 +5,7 @@ import {
   Pressable,
   TextInput,
   ScrollView,
+  Image,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import PromptModal from '../components/Modal';
@@ -23,15 +24,14 @@ import {
   onSelectedPrompt,
   updateText,
 } from '../redux/reducer/promptReducer';
-const promptList = [
-  {prompt: 'I’m really passionate about', text: '', id: 0},
-  {prompt: 'A movie I was influenced by', text: '', id: 1},
-  {prompt: 'To me success is', text: '', id: 2},
-  {prompt: 'A trait I admire in people', text: '', id: 3},
-  {prompt: 'A social issue I care deeply about', text: '', id: 4},
-  {prompt: 'A historical figure I want to meet', text: '', id: 5},
-];
-const Prompts = ({addBasicDetail, all_detail}) => {
+import urls from '../utils/urls';
+import auth from '@react-native-firebase/auth';
+import axios from 'axios';
+
+const Prompts = ({addBasicDetail, all_detail, route}) => {
+  const r = route.params;
+  // console.log(r?.fromEditScreen);
+
   const navigation = useNavigation();
   const [prompt, setPrompt] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
@@ -46,11 +46,15 @@ const Prompts = ({addBasicDetail, all_detail}) => {
   const [isOpen, setIsOpen] = useState(false);
   const prompts = useSelector(state => state?.prompts);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+
   // console.log('count', prompts?.selectedPrompts);
   // state => state.counter.value
   const [question, setQuestion] = useState('');
-  const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
+  const handleOpen = () => setModalVisible(true);
+  const handleClose = () => setModalVisible(false);
+  const profile = useSelector(state => state.basicDetails);
+
   const toggleSelect = index => {
     if (selectedItems.includes(index)) {
       setSelectedItems(selectedItems.filter(item => item !== index));
@@ -59,78 +63,201 @@ const Prompts = ({addBasicDetail, all_detail}) => {
     }
   };
 
-  // useEffect(() => {
-  //   fetch(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/prompts`)
-  //     .then(response => response.json())
-  //     .then(data => setPromptData(data))
-  //     .catch(error => console.error('Error fetching prompts', error));
-  // }, []);
+  useEffect(() => {
+    if (profile?.prompts) {
+      filterToList();
+    } else {
+      fetch(`${urls.PROD_URL}/prompts`)
+        .then(response => response.json())
+        .then(data => {
+          setPromptData(data);
+        })
+        .catch(error => console.error('Error fetching prompts', error));
+    }
+  }, [profile?.prompts]);
 
-  // useEffect(() => {
-  //   const count = Object.keys(promptData).reduce((total, cat) => {
-  //     return (
-  //       total +
-  //       Object.values(promptData[cat]).filter(answer => answer.trim() !== '')
-  //         .length
-  //     );
-  //   }, 0);
-  //   setAnswersCount(count);
-  // }, [promptData]);
+  useEffect(() => {
+    const count = Object.keys(promptData).reduce((total, cat) => {
+      return (
+        total +
+        Object.values(promptData[cat]).filter(answer => answer.trim() !== '')
+          .length
+      );
+    }, 0);
+    setAnswersCount(count);
+  }, [promptData]);
 
-  const showSelectedPrompts = key => {
-    // setCategory(obj);
+  useEffect(() => {}, []);
+
+  const showSelectedPrompts = (obj, key) => {
+    setCategory(obj);
     setActiveIndex(key);
     //console.log(obj)
   };
+  let updatedPrompts = {}; // To keep track of the updated prompts
 
-  // const showPrompt = (prompt, key) => {
-  //   if (answersCount >= 3) {
-  //     alert('You can only answer three prompts.');
-  //     return;
-  //   }
-  //   setModalVisible(true);
-  //   setPrompt(prompt);
-  //   setPromptIndex(key);
-  //   const currentAnswer = promptData[category][prompt];
-  //   setPromptText(currentAnswer || '');
-  // };
+  const updatePrompt = (promptKey, newValue) => {
+    const currentValue = promptData[promptKey];
+    const isAlreadyUpdated = updatedPrompts.hasOwnProperty(promptKey);
+
+    // Count the number of updated prompts
+    const updatedCount = Object.keys(updatedPrompts).length;
+
+    if (updatedCount >= 3 && !isAlreadyUpdated) {
+      alert('You can only update three prompts.');
+      return;
+    }
+
+    // If it's a new update, add it to the updatedPrompts
+    if (!isAlreadyUpdated) {
+      updatedPrompts[promptKey] = newValue;
+    }
+
+    // Update the promptData
+    promptData[promptKey] = newValue;
+
+    // If the value is cleared (i.e., set to an empty string), remove it from updatedPrompts
+    if (newValue === '') {
+      delete updatedPrompts[promptKey];
+    }
+
+    console.log(promptData);
+  };
+
+  const showPrompt = (prompt, key) => {
+    // if (answersCount >= 3) {
+    //   alert('You can only answer three prompts.');
+    //   return;
+    // }
+    const currentValue = promptData[category][prompt];
+    console.log(answersCount);
+    console.log('currentValue', currentValue);
+    console.log(answersCount <= 3 && currentValue);
+    if (answersCount === 3) {
+      if (currentValue) {
+        setModalVisible(true);
+        setPrompt(prompt);
+        setPromptIndex(key);
+        const currentAnswer = promptData[category][prompt];
+
+        setPromptText(currentAnswer || '');
+      } else {
+        alert('You can only answer three prompts.');
+      }
+    }
+    // if (answersCount < 3) {
+    // }
+    if (answersCount < 3) {
+      setModalVisible(true);
+      setPrompt(prompt);
+      setPromptIndex(key);
+      const currentAnswer = promptData[category][prompt];
+
+      setPromptText(currentAnswer || '');
+    } else {
+      // alert('You can only answer three prompts.');
+      // return;
+    }
+  };
 
   const handleBack = () => {
     //handle logout
     //console.log('clicked detail')
   };
 
+  const onHandle = () => {
+    uploadAnswers(category, prompt, promptText ?? '', updatedPromptData => {
+      addBasicDetail({prompt: updatedPromptData});
+      setModalVisible(false);
+    });
+    setModalVisible(false);
+  };
+
+  const uploadAnswers = (category, prompt, value, callback) => {
+    setPromptData(prevPrompts => {
+      const updatedPrompts = {
+        ...prevPrompts,
+        [category]: {
+          ...prevPrompts[category],
+          [prompt]: value,
+        },
+      };
+
+      if (callback) {
+        callback(updatedPrompts);
+      }
+
+      return updatedPrompts;
+    });
+  };
+  // console.log('promptData', promptData);
   const onContinue = async () => {
     // dispatch(onPromptTextAdd(question));
-    dispatch(updateText({id: Id, text: question}));
+    // dispatch(updateText({id: Id, text: question}));
 
     setQuestion('');
     handleClose();
+
     // const userId = auth().currentUser.uid;
     // const idToken = await auth().currentUser.getIdToken();
     // console.log(promptData);
-    // addBasicDetail({prompt: promptData});
-    // navigation.navigate('Interest');
-    // await axios.post(`${urls.PROD_URL}/prompts/${userId}`,
-    // {
-    //     "responses" : promptData
-    // },
-    // {
-    //     headers: {
-    //         "Authorization": `Bearer ${idToken}`,
-    //         'Content-Type': 'application/json',
-    //     }
-    // }).then(res => {
-    //     console.log(res.data)
-    //     addBasicDetail({prompt: promptData})
-    //     navigation.navigate("Interest");
-    //     setLoading(false)
-    // }).catch(err => {
-    //     console.error("Unable to save detail now. Please try again later", err, err.code);
-    //     setLoading(false)
-    // })
+    if (!r?.fromEditScreen) {
+      addBasicDetail({prompt: promptData});
+      navigation.navigate('Interest');
+    } else {
+      const userId = await auth().currentUser.uid;
+      const idToken = await auth().currentUser.getIdToken();
+      // addBasicDetail({prompt: promptData});
+      // navigation.navigate('Interest');
+      await axios
+        .post(
+          `${urls.PROD_URL}/prompts/${userId}`,
+          {
+            responses: promptData,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+              'Content-Type': 'application/json',
+            },
+          },
+        )
+        .then(res => {
+          // console.log('turn', res.data);
+          addBasicDetail({prompt: res.data?.responses});
+          navigation.goBack();
+
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error(
+            'Unable to save detail now. Please try again later',
+            err,
+            err.code,
+          );
+          setLoading(false);
+        });
+    }
   };
-  // console.log(prompts?.prompts);
+
+  const filterToList = () => {
+    const data = profile?.prompts;
+    setPromptData(data);
+    const result = [];
+
+    for (const section in data) {
+      for (const key in data[section]) {
+        if (data[section][key] !== '') {
+          const item = {};
+          item[key] = data[section][key];
+          result.push(item);
+        }
+      }
+    }
+    // console.log('data', data);
+    // setpromptList(result);
+  };
+  // console.log('ffffhgvhgvhgvhgv');
   useEffect(() => {
     if (prompts.prompts && Id) {
       setQuestion(prompts.prompts.find(i => i.id === Id).text);
@@ -140,7 +267,34 @@ const Prompts = ({addBasicDetail, all_detail}) => {
     <View style={styles.promptDiv}>
       <BackButtonIcon />
       <Text style={styles.text1}>Choose 3 prompts</Text>
+
       <View style={{height: 100}}>
+        <ScrollView horizontal style={styles.categoryDiv}>
+          {Object.keys(promptData).length > 0 &&
+            Object.keys(promptData).map((obj, key) => (
+              <Pressable
+                onPress={() => showSelectedPrompts(obj, key)}
+                style={{marginHorizontal: 5}}
+                key={key}>
+                <View
+                  style={
+                    activeIndex !== key
+                      ? styles.category
+                      : styles.activeCategory
+                  }>
+                  <Text
+                    style={
+                      activeIndex !== key ? styles.text2 : styles.activeText2
+                    }>
+                    {obj}
+                  </Text>
+                </View>
+              </Pressable>
+            ))}
+        </ScrollView>
+      </View>
+
+      {/* <View style={{height: 100}}>
         <View style={styles.categoryDiv}>
           {['Personal', 'World', 'My Type'].map((i, k) => {
             return (
@@ -160,8 +314,9 @@ const Prompts = ({addBasicDetail, all_detail}) => {
             );
           })}
         </View>
-      </View>
-      <ScrollView contentContainerStyle={{paddingBottom: 150}}>
+      </View> */}
+
+      {/* <ScrollView contentContainerStyle={{paddingBottom: 150}}>
         {prompts?.prompts?.map((i, k) => {
           return (
             <Pressable
@@ -210,8 +365,27 @@ const Prompts = ({addBasicDetail, all_detail}) => {
             </Pressable>
           );
         })}
+      </ScrollView> */}
+      <ScrollView contentContainerStyle={{paddingBottom: 150}}>
+        {Object.keys(promptData).length > 0 &&
+          Object.keys(promptData[category]).map((prompt, key) => (
+            <Pressable onPress={() => showPrompt(prompt, key)} key={key}>
+              <View style={styles.prompts}>
+                <View style={styles.promptsView}>
+                  <Text style={styles.promptText}>{prompt}</Text>
+                  {promptData[category][prompt] ? (
+                    <Text style={styles.promptTextAnswer}>
+                      {promptData[category][prompt]}
+                    </Text>
+                  ) : (
+                    ''
+                  )}
+                </View>
+              </View>
+            </Pressable>
+          ))}
       </ScrollView>
-      {prompts?.prompts?.filter(i => i?.text).length === 3 && (
+      {answersCount >= 3 && (
         <AbsoluteView
           B={0}
           style={{height: 100, justifyContent: 'center'}}
@@ -222,7 +396,7 @@ const Prompts = ({addBasicDetail, all_detail}) => {
             W={width * 0.75}
             BOR={13}
             BG={Colors.textSecondary}
-            // onPress={() => nav.navigate('Prompts')}
+            onPress={onContinue}
             center_me="center"
             FullRowCenter
             // style={{borderWidth: 2, borderColor:"red"}}
@@ -237,7 +411,7 @@ const Prompts = ({addBasicDetail, all_detail}) => {
           </AppView>
         </AbsoluteView>
       )}
-      {isOpen && (
+      {modalVisible && (
         <BlurView
           intensity={100}
           blurReductionFactor={30}
@@ -249,23 +423,21 @@ const Prompts = ({addBasicDetail, all_detail}) => {
               <AbsoluteView onPress={handleClose} T={15} R={15}>
                 <CrossCancelIcon size={18} />
               </AbsoluteView>
-              <Text style={styles.optionText}>
-                {prompts?.selectedPrompts?.prompt}
-              </Text>
+              <Text style={styles.optionText}>{prompt}</Text>
               <TextInput
-                onChangeText={setQuestion}
+                onChangeText={setPromptText}
+                value={promptText}
                 style={styles.optionText1}
                 multiline
                 placeholderTextColor={'#A09D9D'}
                 placeholder="Type here ..."
-                value={question}
               />
             </View>
-            <ContinueButton onPress={onContinue} />
+            <ContinueButton onPress={onHandle} />
           </View>
         </BlurView>
       )}
-
+      {/* 
       {modalVisible && (
         <PromptModal
           modalVisible={modalVisible}
@@ -286,7 +458,7 @@ const Prompts = ({addBasicDetail, all_detail}) => {
         <View style={styles.button}>
           <ContinueButton onPress={onContinue} />
         </View>
-      )}
+      )} */}
     </View>
   );
 };
@@ -347,9 +519,10 @@ const styles = StyleSheet.create({
   categoryDiv: {
     flexDirection: 'row',
     marginTop: 38,
-    justifyContent: 'space-around',
+    // justifyContent: 'space-around',
     // height: 40,
     paddingHorizontal: 5,
+
     width: '100%',
     //marginBottom: 20
   },

@@ -1,10 +1,17 @@
 # Dynamic resolution of the react_native_pods.rb using Node.js
-require Pod::Executable.execute_command('node', ['-p',
-  'require.resolve(
-    "react-native/scripts/react_native_pods.rb",
-    {paths: [process.argv[1]]},
-  )', __dir__]).strip
 
+def node_require(script)
+  # Resolve script with node to allow for hoisting
+  require Pod::Executable.execute_command('node', ['-p',
+    "require.resolve(
+      '#{script}',
+      {paths: [process.argv[1]]},
+    )", __dir__]).strip
+end
+  
+node_require('react-native/scripts/react_native_pods.rb')
+node_require('react-native-permissions/scripts/setup.rb')
+  
 # Setting the platform and defining pods with modular headers
 platform :ios, '12.4'
 #pod 'Firebase', :modular_headers => true
@@ -15,6 +22,31 @@ platform :ios, '12.4'
 # pod 'FirebaseCoreExtension', :modular_headers => true
 # pod 'FirebaseFirestoreInternal', :modular_headers => true
 
+
+
+setup_permissions([
+  # 'AppTrackingTransparency',
+  # 'Bluetooth',
+  # 'Calendars',
+  # 'CalendarsWriteOnly',
+  'Camera',
+  # 'Contacts',
+  # 'FaceID',
+  'LocationAccuracy',
+  # 'LocationAlways',
+  'LocationWhenInUse',
+  # 'MediaLibrary',
+  # 'Microphone',
+  # 'Motion',
+  # 'Notifications',
+  # 'PhotoLibrary',
+  # 'PhotoLibraryAddOnly',
+  # 'Reminders',
+  # 'Siri',
+  # 'SpeechRecognition',
+  # 'StoreKit',
+])
+
 # Prepare React Native project by invoking the necessary script
 prepare_react_native_project!
 flipper_version = '0.125.0'  # You can try different versions if this doesn't work
@@ -22,6 +54,7 @@ flipper_version = '0.125.0'  # You can try different versions if this doesn't wo
 # Handling Flipper based on an environment variable
 #flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
 flipper_config = FlipperConfiguration.disabled
+
 
 
 # Conditional linking of frameworks based on an environment variable
@@ -40,6 +73,7 @@ target 'realate' do
   # Retrieve and set default flags
   flags = get_default_flags()
 
+   
   # Use React Native configurations
   use_react_native!(
     :path => config[:reactNativePath],

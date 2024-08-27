@@ -32,7 +32,7 @@ const ViewUserScreen = () => {
     const idToken = auth().currentUser.getIdToken();
 
     axios
-      .get(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user/${userId}`, {
+      .get(`${urls.PROD_URL}/user/${userId}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`,

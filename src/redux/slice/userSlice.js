@@ -5,6 +5,7 @@ export const userSlice = createSlice({
   initialState: {
     isAuthenticated: false,
     hasCompletedOnboarding: false,
+    hasCompletedRegistration: false,
   },
   reducers: {
     setAuthentication: (state, action) => {
@@ -13,10 +14,17 @@ export const userSlice = createSlice({
     setOnboardingCompletion: (state, action) => {
       state.hasCompletedOnboarding = action.payload;
     },
+    setCompletedRegistration: (state, action) => {
+      state.hasCompletedRegistration = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {setAuthentication, setOnboardingCompletion} = userSlice.actions;
+export const {
+  setAuthentication,
+  setOnboardingCompletion,
+  setCompletedRegistration,
+} = userSlice.actions;
 
 export default userSlice.reducer;

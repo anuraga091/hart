@@ -3,9 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Pressable,
-  TextInput,
-  ImageBackground,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
@@ -17,12 +14,49 @@ import auth from '@react-native-firebase/auth';
 import axios from 'axios';
 import urls from '../utils/urls';
 import {calculateAge} from '../utils/constants';
+import {AppView} from 'react-native-quick-components';
+import {height} from '../utils/styles/fontsSizes';
+import firestore from '@react-native-firebase/firestore';
+import {firebase} from '@react-native-firebase/firestore';
 
 const Homepage = ({data}) => {
   const [matches, setMatches] = useState([]); // State to store matches
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigation = useNavigation();
   const {isAuthenticated, hasCompletedOnboarding} = data.user;
+  const [showUsers, setShowUsers] = useState([]);
+  const [hideUsers, setHideUsers] = useState([]);
+  const currentUser = firebase.auth().currentUser;
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('LikedUsers')
+      .doc(currentUser.uid)
+      .onSnapshot(documentSnapshot => {
+        // console.log('documentSnapshot.exists', documentSnapshot.exists);
+        if (documentSnapshot.exists) {
+          const data = documentSnapshot.data();
+          setShowUsers(data.Show || []);
+          setHideUsers(data.Hide || []);
+        }
+      });
+
+    return () => unsubscribe();
+  }, [currentUser.uid]);
+
+  const handleMoveUser = () => {
+    if (hideUsers.length > 0 && showUsers.length < 25) {
+      const updatedHideUsers = [...hideUsers];
+      const userToShow = updatedHideUsers.pop();
+      const updatedShowUsers = [...showUsers, userToShow];
+
+      // Update Firestore
+      firestore().collection('LikedUsers').doc(currentUser.uid).update({
+        Hide: updatedHideUsers,
+        Show: updatedShowUsers,
+      });
+    }
+  };
 
   useEffect(() => {
     if (isAuthenticated && !hasCompletedOnboarding) {
@@ -31,40 +65,39 @@ const Homepage = ({data}) => {
   }, [isAuthenticated, hasCompletedOnboarding, navigation]);
 
   useEffect(() => {
-    const userId = data.basicDetails.firebaseUid;
-    const idToken = auth().currentUser.getIdToken();
-
-    axios
-      .get(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/matches/${userId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-      })
-      .then(res => {
-        console.log(res.data);
-        console.log(res.data.matches);
-        const matches = res.data.matches;
-        setMatches(res.data.matches);
-      })
-      .catch(err => {
-        console.error(
-          'Unable to save detail now. Please try again later',
-          err,
-          err.code,
-        );
-        setLoading(false);
-      });
+    const userId = data.basicDetails?.firebaseUid;
+    (async () => {
+      const idToken = await auth().currentUser.getIdToken();
+      // console.log(idToken);
+      // console.log(userId);
+      axios
+        .get(`${urls.PROD_URL}/matches/${userId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+        })
+        .then(res => {
+          // console.log(res.data);
+          console.log(res.data.matches);
+          const matches = res.data.matches;
+          setMatches(res.data.matches);
+        })
+        .catch(err => {
+          console.log(
+            'Unable to save detail now. Please try again later',
+            err.response.data,
+          );
+        });
+    })();
   }, []);
 
   const handleAction = async (action, targetFirebaseUid, prompts, reply) => {
-    console.log(action, targetFirebaseUid, prompts, reply);
-
     const idToken = await auth().currentUser.getIdToken();
     const firebaseUid = data.basicDetails.firebaseUid;
     await axios
       .post(
-        `${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user-action`,
+        `${urls.PROD_URL}/user-action`,
         {
           actionType: action,
           firebaseUid: firebaseUid,
@@ -91,7 +124,6 @@ const Homepage = ({data}) => {
           err,
           err.code,
         );
-        setLoading(false);
       });
   };
 
@@ -283,9 +315,13 @@ const Homepage = ({data}) => {
           </View>
         </ScrollView>
       ) : (
-        <Text>No more matches available.</Text>
+        <AppView FullRowCenter H={height}>
+          <Text style={{textAlign: 'center', color: '#a1a0a0'}}>
+            No more matches available.
+          </Text>
+        </AppView>
       )}
-      <Footer />
+      <Footer index={1} />
     </View>
   );
 };

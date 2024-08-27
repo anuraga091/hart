@@ -1,23 +1,131 @@
 import {StyleSheet, View, Image, Text, Pressable} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Color, FontFamily} from '../GlobalStyles';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {AppLogoIcon} from '../utils/assetComp/IconComp';
 import {width} from '../utils/styles/fontsSizes';
+// import auth from '@react-native-firebase/auth';
+import {getAuth, onAuthStateChanged} from '@react-native-firebase/auth';
+import {getLocation} from '../utils/useLocation';
+import axios from 'axios';
+import urls from '../utils/urls';
+import {addBasicDetail} from '../redux/reducer/basicDetailsSlice';
+import {
+  setAuthentication,
+  setOnboardingCompletion,
+} from '../redux/slice/userSlice';
 
 const IntroPage1 = ({navigation}) => {
   const {isAuthenticated, hasCompletedOnboarding} = useSelector(
     state => state.user,
   );
 
-  useEffect(() => {
-    if (isAuthenticated && !hasCompletedOnboarding) {
-      navigation.navigate('Details');
-    } else if (isAuthenticated && hasCompletedOnboarding) {
-      navigation.navigate('Homepage');
-    }
-  }, [isAuthenticated, hasCompletedOnboarding, navigation]);
+  const details = useSelector(state => state.basicDetails);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const auth = getAuth();
+
+    const unsubscribe = onAuthStateChanged(auth, async user => {
+      // console.log('user', user);
+      setLoading(true);
+      if (user) {
+        const idToken = await user.getIdToken();
+        getLocation(
+          position => {
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            const altitude = position.coords.altitude;
+            const accuracy = position.coords.accuracy;
+            const location = {
+              lat: lat,
+              long: long,
+              altitude: altitude,
+              accuracy: accuracy,
+            };
+            console.log('location', location);
+            console.log('user.uid', user.uid);
+            axios
+              .post(
+                `${urls.PROD_URL}/user/location`,
+                {
+                  firebaseUid: user.uid,
+                  location: location,
+                  // Add any other relevant information
+                },
+                {
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${idToken}`,
+                  },
+                },
+              )
+              .then(res => {
+                // Handle response
+                console.log('Location updated', res.data);
+              })
+              .catch(err => {
+                console.log('Failed to update location', err);
+              });
+          },
+          error => {
+            // setError(error.message);
+          },
+        );
+        // console.log('user.uid', user.uid);
+        await axios
+          .get(`${urls.PROD_URL}/user/${user?.uid}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${idToken}`,
+            },
+          })
+          .then(res => {
+            // console.log(res.data);
+            const {hasCompletedOnboarding, ...restData} = res.data;
+            dispatch(addBasicDetail(restData));
+            dispatch(setOnboardingCompletion(res.data.hasCompletedOnboarding));
+            // dispatch(setOnboardingCompletion(true));
+            setLoading(false);
+          })
+          .catch(err => {
+            console.log('No user Found', err);
+            setLoading(false);
+          });
+        dispatch(setAuthentication(true));
+      } else {
+        dispatch(setAuthentication(false));
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!loading) {
+      if (isAuthenticated && !hasCompletedOnboarding) {
+        navigation.navigate('Details');
+      } else if (isAuthenticated && hasCompletedOnboarding) {
+        navigation.navigate('Homepage');
+        console.log('homepage');
+      } else if (!isAuthenticated && !hasCompletedOnboarding) {
+        console.log('login');
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'Login'}],
+          });
+        }, 2000);
+      }
+    } else {
+      console.log('loading');
+    }
+
+    return clearTimeout();
+  }, [isAuthenticated, hasCompletedOnboarding, navigation, loading]);
+  // console.log('isLoding', loading);
   const handleChange = () => {
     navigation.navigate('Login');
   };
@@ -69,11 +177,11 @@ const IntroPage1 = ({navigation}) => {
             </View> 
         </View> */}
 
-      <Pressable
+      {/* <Pressable
         style={[styles.buttonContainer, styles.button]}
         onPress={handleChange}>
         <Text style={styles.next}>Next</Text>
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 };

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Text, Pressable, Image} from 'react-native';
 import {DraggableGrid} from 'react-native-draggable-grid';
 import {FONT_SIZES, height, width} from '../utils/styles/fontsSizes';
@@ -7,6 +7,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {AbsoluteView, AppImage} from 'react-native-quick-components';
 import {ImgSrc} from '../utils/assetComp/ImgSrc';
 import {AddIcon} from '../utils/assetComp/IconComp';
+import {useSelector} from 'react-redux';
 
 export const DraggableBox = ({onLongPress = () => {}}) => {
   const [selectedImages, setSelectedImages] = useState([
@@ -15,6 +16,14 @@ export const DraggableBox = ({onLongPress = () => {}}) => {
     {image: '', key: 3, text: 'Pic 3'},
     {image: '', key: 4, text: 'Pic 4'},
   ]);
+  const profile = useSelector(state => state.basicDetails);
+  useEffect(() => {
+    const updatedImages = selectedImages.map((item, index) => ({
+      ...item,
+      image: profile?.profilePictures?.[index] || '',
+    }));
+    setSelectedImages(updatedImages);
+  }, [profile]);
 
   const openImagePicker = ind => {
     ImagePicker.openPicker({

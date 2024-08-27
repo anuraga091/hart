@@ -22,9 +22,20 @@ import LessBack from '../../assets/svg/lessback.svg';
 import Reload from '../../assets/svg/reload.svg';
 import Star from '../../assets/svg/star.svg';
 import AppLogo from '../../assets/svg/applogo.svg';
-
+import SelectedBox from '../../assets/svg/slectedBox.svg';
+import UnselectedBox from '../../assets/svg/unselectedBox.svg';
 import {useNavigation} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native';
+
+// Define components
+export const UnselectedBoxIcon = ({w = 30, h = 30, size}) => (
+  <UnselectedBox height={size ?? h} width={size ?? w} />
+);
+
+// Define components
+export const SelectedBoxIcon = ({w = 30, h = 30, size}) => (
+  <SelectedBox height={size ?? h} width={size ?? w} />
+);
 
 // Define components
 export const AppLogoIcon = ({w = 30, h = 30, size}) => (
@@ -75,13 +86,19 @@ export const BackgroundImageIcon = ({w = 30, h = 30, size}) => (
   <BackgroundImage height={size ?? h} width={size ?? w} />
 );
 
-export const BackButtonIcon = ({w = 25, h = 25, size}) => {
+export const BackButtonIcon = ({w = 25, h = 25, size, onPress}) => {
   const {goBack} = useNavigation();
   return (
     <TouchableOpacity
       style={{marginTop: '7%', marginLeft: '4%'}}
       activeOpacity={0.5}
-      onPress={goBack}>
+      onPress={() => {
+        if (!onPress) {
+          goBack();
+        } else {
+          onPress();
+        }
+      }}>
       <LessBack height={size ?? h} width={size ?? w} />
     </TouchableOpacity>
   );

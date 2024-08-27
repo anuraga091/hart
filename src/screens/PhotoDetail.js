@@ -25,7 +25,7 @@ import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 
 const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
-  console.log(basic_detail);
+  // console.log(basic_detail);
   const navigation = useNavigation();
   const [selectedImages, setSelectedImages] = useState(['', '', '', '']);
 
@@ -135,7 +135,7 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
 
     await axios
       .post(
-        `${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
+        `${urls.PROD_URL}/user`,
         {
           firebaseUid: userId,
           phone: phoneNumber,
@@ -182,17 +182,16 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
         name: `Image-${new Date().getTime()}.jpg`,
       });
     });
-
     // Send to backend
     await axios
-      .post(`${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/upload`, data, {
+      .post(`${urls.PROD_URL}/upload`, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       })
       .then(res => {
         const result = res.data.urls;
-        //console.log(result)
+        console.log('result', res.data);
         //uploadS3URLs(result)
         addBasicDetail({profilePictures: result}); // Assuming result.urls is an array of S3 URLs
         //
@@ -200,7 +199,7 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
         setLoading(false);
       })
       .catch(error => {
-        console.error(error);
+        console.error('error t', error);
         setLoading(false);
         // Handle errors (e.g., show an alert)
       });

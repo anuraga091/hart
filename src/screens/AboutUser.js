@@ -5,11 +5,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Footer from '../components/footer';
 import {useNavigation} from '@react-navigation/native';
-import {connect} from 'react-redux';
+import {connect, useSelector} from 'react-redux';
 import {addBasicDetail, logout} from '../redux/reducer/basicDetailsSlice';
 import auth from '@react-native-firebase/auth';
 import {
@@ -42,6 +43,10 @@ const AboutUser = ({
 }) => {
   const navigation = useNavigation();
   const [openFilter, setOpenFilter] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const profile = useSelector(state => state.basicDetails);
+  // console.log('fff', profile);
+
   const [profilePicture, setProfilePicture] = useState(
     data?.basicDetails?.profilePictures?.length > 0
       ? data?.basicDetails?.profilePictures[0]
@@ -87,10 +92,10 @@ const AboutUser = ({
     }
   };
 
-  // useEffect(() => {
-  //   const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-  //   return subscriber; // unsubscribe on unmount
-  // }, []);
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
 
   const handleOpenFilters = () => {
     setOpenFilter(true);
@@ -105,7 +110,12 @@ const AboutUser = ({
   };
 
   const updateInterestPreference = async () => {
+    navigation.navigate('PreferenceFilter', {type: 'interest'});
+    return;
     const idToken = await auth().currentUser.getIdToken();
+    const updatedInterest = {
+      interestedIn: genderPreference,
+    };
 
     await axios
       .post(
@@ -122,7 +132,7 @@ const AboutUser = ({
           },
         },
       )
-      .then(() => {
+      .then(res => {
         addBasicDetail({interestedIn: genderPreference});
         setLoading(false);
       })
@@ -137,6 +147,8 @@ const AboutUser = ({
   };
 
   const updateAgePreference = async () => {
+    navigation.navigate('PreferenceFilter', {type: 'age'});
+    return;
     const idToken = await auth().currentUser.getIdToken();
 
     await axios
@@ -159,7 +171,7 @@ const AboutUser = ({
           },
         },
       )
-      .then(() => {
+      .then(res => {
         //navigation.navigate("About-1");
         //setOnboardingCompletion(true)
         //setOpenPhotoRoute(true)
@@ -185,6 +197,8 @@ const AboutUser = ({
   };
 
   const updateDistancePreference = async () => {
+    navigation.navigate('PreferenceFilter', {type: 'distance'});
+    return;
     const idToken = await auth().currentUser.getIdToken();
 
     await axios
@@ -204,7 +218,7 @@ const AboutUser = ({
           },
         },
       )
-      .then(() => {
+      .then(res => {
         addBasicDetail({
           preferences: {
             distance: distancePreference,
@@ -223,6 +237,8 @@ const AboutUser = ({
   };
 
   const updateHeightPreference = async () => {
+    navigation.navigate('PreferenceFilter', {type: 'height'});
+    return;
     const idToken = await auth().currentUser.getIdToken();
 
     await axios
@@ -245,7 +261,7 @@ const AboutUser = ({
           },
         },
       )
-      .then(() => {
+      .then(res => {
         addBasicDetail({
           preferences: {
             height: {
@@ -269,19 +285,22 @@ const AboutUser = ({
   const viewProfile = () => {
     navigation.navigate('ViewProfile');
   };
-
   return (
     <View style={styles.container}>
-      <BackButtonIcon />
+      <BackButtonIcon
+        onPress={() => {
+          handleBack();
+        }}
+      />
 
       <ScrollView contentContainerStyle={{paddingBottom: 150}}>
         <View style={styles.profileSection}>
           <Image
-            source={{uri: ImgSrc.girl}} // Replace with your image URI
+            source={{uri: profilePicture}} // Replace with your image URI
             style={styles.profileImage}
           />
           <View style={styles.profileTexts}>
-            <Text style={styles.profileName}>Eshan</Text>
+            <Text style={styles.profileName}>{data?.basicDetails?.name}</Text>
             <AppView
               FullRowCenter
               // nav.navigate('Prompts')
@@ -396,7 +415,10 @@ const AboutUser = ({
                 style={styles.filterItem}>
                 <View style={styles.filter}>
                   <Text style={styles.filterTitle}>Age</Text>
-                  <Text style={styles.filterTitleSecond}>18-20</Text>
+                  <Text style={styles.filterTitleSecond}>
+                    {profile?.preferences?.ageRange?.min} -
+                    {' ' + profile?.preferences?.ageRange?.max}
+                  </Text>
                 </View>
                 <Image
                   resizeMode="cover"
@@ -415,7 +437,9 @@ const AboutUser = ({
                 style={styles.filterItem}>
                 <View style={styles.filter}>
                   <Text style={styles.filterTitle}>Distance</Text>
-                  <Text style={styles.filterTitleSecond}>Within 15 kms</Text>
+                  <Text style={styles.filterTitleSecond}>
+                    Within {profile?.preferences?.distance} kms
+                  </Text>
                 </View>
                 <Image
                   resizeMode="cover"
@@ -434,7 +458,10 @@ const AboutUser = ({
                 style={styles.filterItem}>
                 <View style={styles.filter}>
                   <Text style={styles.filterTitle}>Height</Text>
-                  <Text style={styles.filterTitleSecond}>5’1 to 5’4</Text>
+                  <Text style={styles.filterTitleSecond}>
+                    {profile?.preferences?.height?.min} or{' '}
+                    {profile?.preferences?.height?.max}
+                  </Text>
                 </View>
                 <Image
                   resizeMode="cover"
@@ -446,6 +473,7 @@ const AboutUser = ({
           </View>
         )}
       </ScrollView>
+      <Footer index={4} />
     </View>
   );
 };

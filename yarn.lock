@@ -2444,6 +2444,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-assets/slider@npm:^7.2.1":
+  version: 7.2.1
+  resolution: "@react-native-assets/slider@npm:7.2.1"
+  peerDependencies:
+    react: ">=16.13.1"
+    react-dom: ">=16.13.1"
+    react-native: ">=0.61.4"
+    react-native-web: ">=0.13.4"
+  checksum: 7b7ac2c5f45cfdcfa4417f5f8e230d21fcd9aeb96504ae9893b3118fbbe3b68972d23cdf52bc244919700e8423452d4edfc2d0d750c5047dcbfab6cf06a4203b
+  languageName: node
+  linkType: hard
+
 "@react-native-async-storage/async-storage@npm:^1.19.3":
   version: 1.24.0
   resolution: "@react-native-async-storage/async-storage@npm:1.24.0"
@@ -11340,7 +11352,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-permissions@npm:^4.0.0":
+"react-native-permissions@npm:^4.1.5":
   version: 4.1.5
   resolution: "react-native-permissions@npm:4.1.5"
   peerDependencies:
@@ -11631,6 +11643,7 @@ __metadata:
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
     "@notifee/react-native": ^7.8.2
+    "@react-native-assets/slider": ^7.2.1
     "@react-native-async-storage/async-storage": ^1.19.3
     "@react-native-community/blur": ^4.3.2
     "@react-native-community/datetimepicker": ^7.6.0
@@ -11676,7 +11689,7 @@ __metadata:
     react-native-haptic-feedback: ^2.2.0
     react-native-image-crop-picker: ^0.40.1
     react-native-image-picker: ^7.0.1
-    react-native-permissions: ^4.0.0
+    react-native-permissions: ^4.1.5
     react-native-quick-components: ^0.1.0
     react-native-reanimated: ^3.14.0
     react-native-responsive-fontsize: ^0.5.1

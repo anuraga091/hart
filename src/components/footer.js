@@ -1,34 +1,37 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
-const Footer = () => {
+const Footer = ({index}) => {
   const [activeIndex, setActiveIndex] = useState(1);
   const navigation = useNavigation();
 
-  const handleHomePress = index => {
-    setActiveIndex(index);
+  const handleHomePress = i => {
+    setActiveIndex(i);
     navigation.navigate('Homepage');
     console.log('Home pressed');
   };
 
-  const handleLikesPress = index => {
-    setActiveIndex(index);
-    navigation.navigate('Like');
+  const handleLikesPress = i => {
+    setActiveIndex(i);
+    navigation.navigate('LikedScreen');
     console.log('Favorites pressed');
   };
 
-  const handleChatPress = index => {
-    setActiveIndex(index);
-    navigation.navigate('Chat');
+  const handleChatPress = i => {
+    setActiveIndex(i);
+    navigation.navigate('ChatList');
     console.log('Messages pressed');
   };
 
-  const handleAboutPress = index => {
-    setActiveIndex(index);
+  const handleAboutPress = i => {
+    setActiveIndex(i);
     navigation.navigate('About-User');
     console.log('Profile pressed');
   };
+  useEffect(() => {
+    setActiveIndex(index);
+  }, [index]);
 
   return (
     <View style={styles.footer}>

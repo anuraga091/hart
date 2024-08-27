@@ -27,9 +27,10 @@ import {RFPercentage} from 'react-native-responsive-fontsize';
 import {ThreeDotIcon} from '../../utils/assetComp/IconComp';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import {AppButton} from 'react-native-quick-components';
+import Footer from '../../components/footer';
 
 export const LikedScreen = ({route}) => {
-  const {user} = route?.params;
+  const U = route?.params;
   const [isOpen, setIsOpen] = useState(false);
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
@@ -41,7 +42,7 @@ export const LikedScreen = ({route}) => {
         style="light"
         backgroundColor={colors.background}
       />
-      <ScrollView>
+      <ScrollView contentContainerStyle={{paddingBottom: 200}}>
         <View style={styles.container}>
           <View style={styles.card}>
             <Text style={styles.prompt}>
@@ -51,7 +52,7 @@ export const LikedScreen = ({route}) => {
             <Text style={[styles.likePrompt, {paddingBottom: 30}]}>
               Liked your prompt
             </Text>
-            {user?.message && (
+            {U?.user?.message && (
               <View
                 style={{
                   width: '90%',
@@ -60,7 +61,7 @@ export const LikedScreen = ({route}) => {
                   alignItems: 'flex-start',
                 }}>
                 <View style={styles.responseBox}>
-                  <Text style={styles.response}>{user?.message}</Text>
+                  <Text style={styles.response}>{U?.user?.message}</Text>
                 </View>
 
                 <View style={styles.triangleRight} />
@@ -68,7 +69,7 @@ export const LikedScreen = ({route}) => {
             )}
           </View>
           <View style={styles.profileCard}>
-            <Text style={styles.name}>{user?.displayName}</Text>
+            <Text style={styles.name}>{U?.user?.displayName}</Text>
             <TouchableOpacity style={styles.moreButton} onPress={handleOpen}>
               <ThreeDotIcon size={20} />
             </TouchableOpacity>
@@ -81,17 +82,18 @@ export const LikedScreen = ({route}) => {
                 //   enableVibrateFallback: false,
                 //   ignoreAndroidSystemSettings: false,
                 // });
-                navigation.navigate('ProfileScreen', {user});
+                navigation.navigate('ProfileScreen', {user: U?.user});
               }}>
               <Image
                 source={{
-                  uri: user?.image,
+                  uri: U?.user?.image,
                 }}
                 style={styles.image}
               />
             </TouchableOpacity>
           </View>
         </View>
+        <SwipeUnlock user={U?.user} />
       </ScrollView>
       {/* <AppButton
         title="Native"
@@ -108,7 +110,6 @@ export const LikedScreen = ({route}) => {
           });
         }}
       /> */}
-      <SwipeUnlock user={user} />
       {isOpen && (
         <BlurView
           intensity={100}
@@ -137,6 +138,7 @@ export const LikedScreen = ({route}) => {
           </View>
         </BlurView>
       )}
+      <Footer index={2} />
     </SafeAreaView>
   );
 };

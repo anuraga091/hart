@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -14,42 +13,85 @@ import {useNavigation} from '@react-navigation/native';
 import {
   BackButtonIcon,
   CrossCancelIcon,
-  LessBackIcon,
   RightarrowIcon,
 } from '../../utils/assetComp/IconComp';
-import DraggableFlatList, {
-  ScaleDecorator,
-} from 'react-native-draggable-flatlist';
-import MyTest, {DraggableBox} from '../../components/DraggableBox';
+import {DraggableBox} from '../../components/DraggableBox';
 import {BlurView} from '@react-native-community/blur';
-import {
-  AbsoluteView,
-  AppButton,
-  AppText,
-  AppView,
-} from 'react-native-quick-components';
+import {AbsoluteView, AppText, AppView} from 'react-native-quick-components';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   onPromptTextAdd,
   onSelectedPrompt,
 } from '../../redux/reducer/promptReducer';
+import {addBasicDetail} from '../../redux/reducer/basicDetailsSlice';
+import urls from '../../utils/urls';
+import axios from 'axios';
+import auth from '@react-native-firebase/auth';
 
 export const EditProfileScreen = () => {
   const nav = useNavigation();
   const prompts = useSelector(state => state?.prompts);
-  // console.log(prompts);
+  const profile = useSelector(state => state.basicDetails);
+  // console.log(profile?.prompts);
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolling, setIsScrolling] = useState(true);
-  const [question, setQuestion] = useState('');
+  const [question, setQuestion] = useState();
+  const [questionHeading, setQuestionHeading] = useState('');
+  const [promptList, setpromptList] = useState([]);
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
   const disptach = useDispatch();
 
   useEffect(() => {
-    if (prompts?.selectedPrompts?.text) {
-      setQuestion(prompts.selectedPrompts?.text);
+    filterToList();
+  }, [profile?.prompt]);
+
+  const filterToList = () => {
+    const data = profile?.prompt;
+    const result = [];
+
+    for (const section in data) {
+      for (const key in data[section]) {
+        if (data[section][key] !== '') {
+          const item = {};
+          item[key] = data[section][key];
+          result.push(item);
+        }
+      }
     }
-  }, [prompts?.selectedPrompts]);
+    setpromptList(result);
+  };
+  // console.log();
+
+  const handlePrompts = async () => {
+    const userId = await auth().currentUser.uid;
+    const idToken = await auth().currentUser.getIdToken();
+    await axios
+      .post(
+        `${urls.PROD_URL}/prompts/${userId}`,
+        {
+          responses: 'promptData',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      .then(res => {
+        // console.log('turn', res.data);
+        addBasicDetail({prompt: res.data?.responses});
+      })
+      .catch(err => {
+        console.error(
+          'Unable to save detail now. Please try again later',
+          err,
+          err.code,
+        );
+        // setLoading(false);
+      });
+  };
 
   return (
     <View style={styles.container}>
@@ -64,24 +106,26 @@ export const EditProfileScreen = () => {
           }}
         />
 
-        {prompts?.prompts
-          ?.filter(i => i.text)
-          .map((i, k) => {
-            return (
-              <TouchableOpacity
-                key={k}
-                onPress={() => {
-                  // nav.navigate('LikedScreen');
-                  handleOpen();
-                  disptach(onSelectedPrompt(k));
-                }}
-                style={styles.infoBox}>
-                <Text style={styles.infoTitle}>{i?.prompt}</Text>
+        {promptList.map((i, k) => {
+          const key = Object.keys(i)[0]; // Get the key from the object
+          const value = i[key];
+          return (
+            <TouchableOpacity
+              key={k}
+              onPress={() => {
+                // nav.navigate('LikedScreen');
+                handleOpen();
+                setQuestionHeading(key);
+                setQuestion(value);
+                // disptach(onSelectedPrompt(k));
+              }}
+              style={styles.infoBox}>
+              <Text style={styles.infoTitle}>{key}</Text>
 
-                <Text style={styles.infoText}>{i?.text}</Text>
-              </TouchableOpacity>
-            );
-          })}
+              <Text style={styles.infoText}>{value}</Text>
+            </TouchableOpacity>
+          );
+        })}
         <View style={styles.details}>
           <AppView RowSpacBtw>
             <View>
@@ -116,9 +160,7 @@ export const EditProfileScreen = () => {
               <AbsoluteView onPress={handleClose} T={15} R={15}>
                 <CrossCancelIcon size={18} />
               </AbsoluteView>
-              <Text style={styles.optionText}>
-                {prompts?.selectedPrompts?.prompt}
-              </Text>
+              <Text style={styles.optionText}>{questionHeading}</Text>
               <TextInput
                 onChangeText={setQuestion}
                 style={styles.optionText1}
@@ -138,7 +180,7 @@ export const EditProfileScreen = () => {
               BOW={1}
               onPress={() => {
                 handleClose();
-                disptach(onPromptTextAdd(question));
+                // disptach(onPromptTextAdd(question));
               }}
               BOC={Colors.dark}>
               <AppText
@@ -156,7 +198,7 @@ export const EditProfileScreen = () => {
               onPress={() => {
                 handleClose();
                 setTimeout(() => {
-                  nav.navigate('Prompts');
+                  nav.navigate('Prompts', {fromEditScreen: true});
                 }, 200);
               }}
               center_me="center"

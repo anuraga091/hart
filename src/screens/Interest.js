@@ -41,14 +41,14 @@ const Interest = ({
 
   const data = onboarding_data.basicDetails;
 
-  console.log(value);
+  // console.log(data);
 
   const onContinue = async () => {
     const idToken = await auth().currentUser.getIdToken();
 
     await axios
       .post(
-        `${urls.LOCAL_URL_FOR_PHYSICAL_DEVICE}/user`,
+        `${urls.PROD_URL}/user`,
         {
           name: data.name,
           gender: data.gender,
@@ -60,9 +60,20 @@ const Interest = ({
           creationTime: data.creationTime,
           lastSignInTime: data.lastSignInTime,
           prompts: data.prompt,
-          profilePictures: data.result,
+          profilePictures: data.profilePictures,
           interestedIn: value,
           hasCompletedOnboarding: true,
+          preferences: {
+            ageRange: {
+              min: 18,
+              max: 22,
+            },
+            distance: 25,
+            height: {
+              min: '5\'0"',
+              max: '5\'9"',
+            },
+          },
         },
         {
           headers: {
