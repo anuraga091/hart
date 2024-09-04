@@ -12,13 +12,13 @@ import React from 'react';
 import {Color, FontFamily, FontSize} from '../GlobalStyles';
 import {Colors} from '../utils/styles/colors';
 
-const ContinueButton = ({onPress, isLoading = false}) => {
+const ContinueButton = ({onPress, isLoading = false, disabled = false}) => {
   return (
-    <TouchableOpacity onPress={onPress}>
-      <View style={styles.buttonContainer}>
+    <TouchableOpacity disabled={disabled} onPress={onPress}>
+      <View style={[styles.buttonContainer, {opacity: disabled ? 0.6 : 1}]}>
         <Text style={styles.next}>Continue</Text>
         {isLoading ? (
-          <ActivityIndicator color={Colors.textSecondary} size={40} />
+          <ActivityIndicator color={Colors.borderColor} size={20} />
         ) : (
           <Image
             resizeMode="cover"

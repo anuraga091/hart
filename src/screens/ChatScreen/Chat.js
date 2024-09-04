@@ -47,17 +47,19 @@ import {
   ThreeDotIcon,
 } from '../../utils/assetComp/IconComp';
 import {sendNotification} from '../../notification/notify';
+import {useSelector} from 'react-redux';
 
 export const ChatScreen = ({route}) => {
   const {goBack} = useNavigation();
+  const profile = useSelector(state => state.basicDetails);
   const {user} = route.params;
-  // console.log(user);
+  // console.log(profile?.name);
   const currentUser = firebase.auth().currentUser;
   const ref = useRef(null);
   const chatId =
-    currentUser.uid > user.id
-      ? `${currentUser.uid}-${user.id}`
-      : `${user.id}-${currentUser.uid}`;
+    currentUser.uid > user.firebaseUid
+      ? `${currentUser.uid}-${user.firebaseUid}`
+      : `${user.firebaseUid}-${currentUser.uid}`;
 
   const [messages, setMessages] = useState([]);
   const [isLoading, setisLoading] = useState(true);
@@ -248,9 +250,8 @@ export const ChatScreen = ({route}) => {
       ?.find(i => i?.id !== currentUser.uid);
 
     if (!d?.isOnline) {
-      console.log('sent message');
       sendNotification({
-        title: ` ${user.displayName} sent a message.`,
+        title: ` ${profile?.name} sent a message.`,
         fcmToken: user?.fcmToken,
       });
     }
@@ -529,7 +530,7 @@ export const ChatScreen = ({route}) => {
           </View>
         )}
         {props?.currentMessage?.type === 'chat' &&
-          currentUser.uid === props.currentMessage?.user?.id && (
+          currentUser.uid === props.currentMessage?.user?.firebaseUid && (
             <View
               style={{
                 maxWidth: '80%',
@@ -553,7 +554,7 @@ export const ChatScreen = ({route}) => {
             </View>
           )}
         {props?.currentMessage?.type === 'chat' &&
-          currentUser.uid !== props.currentMessage?.user?.id && (
+          currentUser.uid !== props.currentMessage?.user?.firebaseUid && (
             <View
               style={{
                 maxWidth: '80%',
@@ -601,8 +602,13 @@ export const ChatScreen = ({route}) => {
           <TouchableOpacity onPress={goBack} style={styles.backButton}>
             <LessBackIcon size={20} />
           </TouchableOpacity>
-          <AppImage ML={30} source={{uri: user?.image}} SIZE={45} BOR={50} />
-          <Text style={styles.username}>{user?.displayName}</Text>
+          <AppImage
+            ML={30}
+            source={{uri: user?.profilePictures[0]}}
+            SIZE={45}
+            BOR={50}
+          />
+          <Text style={styles.username}>{user?.name}</Text>
         </View>
         <AppView PB={'4%'}>
           <ThreeDotIcon size={20} />

@@ -19,6 +19,7 @@ import {
   setAuthentication,
   setOnboardingCompletion,
 } from '../redux/slice/userSlice';
+import messaging from '@react-native-firebase/messaging';
 
 const Interest = ({
   onboarding_data,
@@ -36,14 +37,49 @@ const Interest = ({
   ]);
   //const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [disabled, setdisabled] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
 
   const data = onboarding_data.basicDetails;
 
   // console.log(data);
+  const [fcmToken, setFcmToken] = useState(null);
+
+  const getDeviceToken = async () => {
+    // Request permission to show notifications
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    console.log('enabled', enabled);
+
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+
+      // Register the device for remote messages
+      // await messaging().registerDeviceForRemoteMessages();
+
+      // Get the FCM token
+      const token = await messaging().getToken();
+      console.log(token);
+      setFcmToken(token);
+    }
+  };
+  useEffect(() => {
+    getDeviceToken();
+  }, []);
+  useEffect(() => {
+    if (value) {
+      setdisabled(false);
+    } else {
+      setdisabled(true);
+    }
+  }, [value]);
 
   const onContinue = async () => {
+    setLoading(true);
     const idToken = await auth().currentUser.getIdToken();
 
     await axios
@@ -63,6 +99,7 @@ const Interest = ({
           profilePictures: data.profilePictures,
           interestedIn: value,
           hasCompletedOnboarding: true,
+          fcmToken: fcmToken,
           preferences: {
             ageRange: {
               min: 18,
@@ -162,7 +199,11 @@ const Interest = ({
             />
           </View>
 
-          <ContinueButton onPress={onContinue} />
+          <ContinueButton
+            isLoading={loading}
+            disabled={disabled}
+            onPress={onContinue}
+          />
         </View>
       }
     </View>

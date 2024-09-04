@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {Provider, useSelector} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -21,7 +21,7 @@ import ViewUserScreen from './src/screens/ViewUserScreen';
 import {ProfileScreen} from './src/screens/ProfileScreen/ProfileScreen';
 import {init} from 'react-native-quick-components';
 import {LikedScreen} from './src/screens/LikedScreen/LikedScreen';
-import {ImageBackground} from 'react-native';
+import {ImageBackground, Platform} from 'react-native';
 import {ImgSrc} from './src/utils/assetComp/ImgSrc';
 import {colors} from './src/utils/styles/colors';
 import {TimelineScreen} from './src/screens/Timeline/TimelineScreen';
@@ -31,6 +31,11 @@ import {CreditScreen} from './src/screens/CreditScreen/CreditScreen';
 import {ComingSoon} from './src/screens/ComingSoon/ComingSoon';
 import {ChatList} from './src/screens/ChatScreen/ChatList';
 import {PreferenceFilter} from './src/screens/PreferenceFilter/PreferenceFilter';
+import notifee, {
+  AndroidImportance,
+  AndroidVisibility,
+} from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
 
 enableLayoutAnimations(true);
 init({
@@ -55,6 +60,75 @@ const AppWrapper = () => {
 
   // const a=loading? "IntroPage1":isAuthenticated? hasCompletedOnboarding? "Homepage":"Details"
   // console.log(initialRouteName);
+  useEffect(() => {
+    // Request notification permissions on iOS
+    const requestPermission = async () => {
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        console.log('Notification permission granted.');
+      } else {
+        console.log('Notification permission not granted.');
+      }
+    };
+
+    if (Platform.OS === 'ios') {
+      requestPermission();
+    }
+
+    // Handle foreground messages
+    const unsubscribe = messaging().onMessage(async message => {
+      console.log('foreground message received', message);
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+        importance: AndroidImportance.HIGH, // Ensure HIGH importance
+        visibility: AndroidVisibility.PUBLIC,
+      });
+
+      //Display a notification
+      notifee.displayNotification({
+        title: `<p style="font-family: 'LibreBaskerville-Bold';"><b>${message.notification.title}"</span></p></b></p>`,
+        body: message.notification?.body ?? '',
+        android: {
+          channelId,
+          color: '#F1DEAC',
+          sound: 'default',
+          smallIcon: 'ic_notification',
+        },
+      });
+
+      // Alert.alert(remoteMessage.notification?.title, remoteMessage.notification?.body);
+    });
+
+    // Handle background messages when app is opened from a quit state
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          console.log(
+            'Notification caused app to open from quit state:',
+            remoteMessage.notification,
+          );
+        }
+      });
+
+    // Handle messages when the app is opened from the background
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      if (remoteMessage) {
+        console.log(
+          'Notification caused app to open from background state:',
+          remoteMessage.notification,
+        );
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
   return (
     <ImageBackground
       source={ImgSrc.background2}

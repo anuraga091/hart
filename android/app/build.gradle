@@ -92,15 +92,14 @@ android {
             keyPassword 'android'
         }
 
-        //Comment this code when running in local
-        // release {
-        //     if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
-        //         storeFile file(MYAPP_RELEASE_STORE_FILE)
-        //         storePassword MYAPP_RELEASE_STORE_PASSWORD
-        //         keyAlias MYAPP_RELEASE_KEY_ALIAS
-        //         keyPassword MYAPP_RELEASE_KEY_PASSWORD
-        //     }
-        // }
+      release {
+            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
          //comment this code when building for production
@@ -116,7 +115,7 @@ android {
 
             signingConfig signingConfigs.debug
             //Comment this code when running in local
-            //signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -127,6 +126,9 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation 'com.google.firebase:firebase-auth-ktx:22.1.2'
+    implementation("com.google.firebase:firebase-auth")
+    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
+    implementation 'com.google.android.gms:play-services-safetynet:18.1.0'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

@@ -5,11 +5,19 @@ import {
   View,
   Pressable,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useState, useRef} from 'react';
 import ContinueButton from '../components/ContinueButton';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
+import axios from 'axios';
+import urls from '../utils/urls';
+import {addBasicDetail} from '../redux/reducer/basicDetailsSlice';
+import {setOnboardingCompletion} from '../redux/slice/userSlice';
+import {useDispatch} from 'react-redux';
+import {AppView} from 'react-native-quick-components';
+import {width} from '../utils/styles/fontsSizes';
 
 const OTP = ({number, verificationId}) => {
   const inputRefs = [
@@ -20,8 +28,11 @@ const OTP = ({number, verificationId}) => {
     useRef(),
     useRef(),
   ];
+  const dispatch = useDispatch();
+
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
+  const [isloading, setIsLoading] = useState(false);
 
   const navigation = useNavigation();
 
@@ -38,6 +49,7 @@ const OTP = ({number, verificationId}) => {
 
   const signup = async () => {
     //console.log(otpDigits)
+    setIsLoading(true);
     const confirmationCode = otpDigits.join('');
     //console.log(confirmationCode)
 
@@ -48,8 +60,32 @@ const OTP = ({number, verificationId}) => {
     await auth()
       .signInWithCredential(credential)
       .then(res => {
-        navigation.navigate('Details');
-        //console.log('Phone authentication successful', res);
+        console.log('Phone authentication successful', res.user.uid);
+        axios
+          .get(`${urls.PROD_URL}/user/${res.user?.uid}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              // Authorization: `Bearer ${idToken}`,
+            },
+          })
+          .then(res => {
+            // console.log(res.data);
+            setIsLoading(false);
+
+            const {hasCompletedOnboarding, ...restData} = res.data;
+            dispatch(addBasicDetail(restData));
+            dispatch(setOnboardingCompletion(res.data.hasCompletedOnboarding));
+            navigation.navigate('Homepage');
+
+            // dispatch(setOnboardingCompletion(true));
+            // setLoading(false);
+          })
+          .catch(err => {
+            console.log('No user Found', err);
+            navigation.navigate('Details');
+
+            // setLoading(false);
+          });
       })
       .catch(error => {
         if (error.code == 'auth/invalid-verification-code') {
@@ -57,6 +93,9 @@ const OTP = ({number, verificationId}) => {
         }
         console.log(error);
         setOtpDigits(['', '', '', '', '', '']);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -82,7 +121,6 @@ const OTP = ({number, verificationId}) => {
       </View>
 
       {error && <Text style={styles.error}>{error}</Text>}
-
       <ContinueButton onPress={signup} />
     </View>
   );

@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "apk": "react-native run-android --variant=release",
+    "aab": "npx react-native build-android --mode=release",
     "test": "jest"
   },
   "dependencies": {

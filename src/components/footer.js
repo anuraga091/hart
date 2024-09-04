@@ -29,16 +29,16 @@ const Footer = ({index}) => {
     navigation.navigate('About-User');
     console.log('Profile pressed');
   };
-  useEffect(() => {
-    setActiveIndex(index);
-  }, [index]);
+  // useEffect(() => {
+  //   setActiveIndex(index);
+  // }, [index]);
 
   return (
     <View style={styles.footer}>
       <TouchableOpacity onPress={() => handleHomePress(1)}>
         <Image
           source={
-            activeIndex == 1
+            index === 1
               ? require('../../assets/home.png')
               : require('../../assets/inactive-home.png')
           }
@@ -48,7 +48,7 @@ const Footer = ({index}) => {
       <TouchableOpacity onPress={() => handleLikesPress(2)}>
         <Image
           source={
-            activeIndex == 2
+            index === 2
               ? require('../../assets/likes.png')
               : require('../../assets/inactive-likes.png')
           }
@@ -58,7 +58,7 @@ const Footer = ({index}) => {
       <TouchableOpacity onPress={() => handleChatPress(3)}>
         <Image
           source={
-            activeIndex == 3
+            index === 3
               ? require('../../assets/chat.png')
               : require('../../assets/inactive-chat.png')
           }
@@ -68,7 +68,7 @@ const Footer = ({index}) => {
       <TouchableOpacity onPress={() => handleAboutPress(4)}>
         <Image
           source={
-            activeIndex == 4
+            index === 4
               ? require('../../assets/about.png')
               : require('../../assets/inactive-about.png')
           }

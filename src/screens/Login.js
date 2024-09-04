@@ -1,4 +1,10 @@
-import {StyleSheet, Text, View, TextInput} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import ContinueButton from '../components/ContinueButton';
 import OTP from './OTP';
@@ -7,17 +13,20 @@ import {firebase} from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
+import {AppView} from 'react-native-quick-components';
+import {height} from '../utils/styles/fontsSizes';
 
 const Login = () => {
   const [number, setNumber] = useState('');
   const [optSent, setOtpSent] = useState(false);
-  const [fcmToken, setFcmToken] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [verificationId, setVerificationId] = useState(null);
   const navigation = useNavigation();
   const onChangeNumber = e => {
     setNumber(e);
   };
+  const [fcmToken, setFcmToken] = useState(null);
+
   const getDeviceToken = async () => {
     await notifee.requestPermission();
 
@@ -37,13 +46,12 @@ const Login = () => {
 
       // Get the FCM token
       const token = await messaging().getToken();
-      console.log(token);
+      // console.log(token);
       setFcmToken(token);
     }
   };
-
   useEffect(() => {
-    // getDeviceToken();
+    getDeviceToken();
   }, []);
 
   const sendOTP = async () => {
@@ -57,10 +65,12 @@ const Login = () => {
       const confirmation = await auth().signInWithPhoneNumber(
         formattedPhoneNumber,
       );
+
       console.log('confirmation', confirmation.verificationId);
       setVerificationId(confirmation.verificationId);
     } catch (error) {
       console.error(error);
+      setIsLoading(false);
     }
     // auth().signOut()
 
@@ -145,6 +155,11 @@ const Login = () => {
           />
         )
       )}
+      {isLoading && (
+        <AppView H={height} FullRowCenter>
+          <ActivityIndicator size={'large'} />
+        </AppView>
+      )}
     </View>
   );
 };
@@ -153,7 +168,7 @@ const styles = StyleSheet.create({
   loginPage: {
     // backgroundColor: 'rgba(0,0,0,0.9)',
     flex: 1,
-    width: '120%',
+    width: '100%',
     height: '100%',
     overflow: 'hidden',
     paddingLeft: 20,

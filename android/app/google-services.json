@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "808180923750",
-    "firebase_url": "https://realate-dating-default-rtdb.firebaseio.com",
-    "project_id": "realate-dating",
-    "storage_bucket": "realate-dating.appspot.com"
+    "project_number": "356975282547",
+    "project_id": "realate-dating-433415",
+    "storage_bucket": "realate-dating-433415.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:808180923750:android:70e37a4e492dfa3e715ca7",
+        "mobilesdk_app_id": "1:356975282547:android:75775151dbcd110505dd06",
         "android_client_info": {
           "package_name": "com.realate"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAfLzLH-8HoZjd_CJvpa9sFPOeSvMFgVqQ"
+          "current_key": "AIzaSyAOjzoDRrU7njVKvwOZncJuaO-T2DSEbTg"
         }
       ],
       "services": {

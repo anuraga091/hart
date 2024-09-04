@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {AbsoluteView, AppText, FlexView} from 'react-native-quick-components';
 import {colors, Colors} from '../../utils/styles/colors';
 import {
@@ -19,13 +19,122 @@ import {
 } from '../../utils/styles/fontsSizes';
 import {ImgSrc} from '../../utils/assetComp/ImgSrc';
 import SwipeUnlock from '../../components/slider';
-import {LikeButtonIcon, PinIcon} from '../../utils/assetComp/IconComp';
+import {
+  BackButtonIcon,
+  LikeButtonIcon,
+  PinIcon,
+} from '../../utils/assetComp/IconComp';
+import axios from 'axios';
+import urls from '../../utils/urls';
+import {useNavigation} from '@react-navigation/native';
+import auth, {firebase} from '@react-native-firebase/auth';
 
 export const ProfileScreen = ({route}) => {
+  const currentUser = firebase.auth().currentUser;
+
   const {user} = route.params;
-  // console.log(user?.message);
+  const {goBack, navigate} = useNavigation();
+  // console.log(user);
+  function collectNonEmptyValues(obj) {
+    const result = {};
+
+    // Iterate over each category (e.g., "My Type", "Personal", etc.)
+    for (const category in obj) {
+      if (obj.hasOwnProperty(category)) {
+        // Iterate over each key-value pair within the category
+        for (const key in obj[category]) {
+          if (obj[category].hasOwnProperty(key) && obj[category][key]) {
+            // Add the key-value pair to the result if the value is non-empty
+            result[key] = obj[category][key];
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+  function getCurrentAgeFromTimestamp(timestamp) {
+    const birthDate = new Date(timestamp);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    // Adjust age if the birth date hasn't occurred yet this year
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  }
+
+  const prompts = collectNonEmptyValues(user?.prompts);
+  const handleAction = async (action, targetFirebaseUid, prompts, reply) => {
+    const idToken = await auth().currentUser.getIdToken();
+    // const firebaseUid = data.basicDetails.firebaseUid;
+    await axios
+      .delete(`${urls.PROD_URL}/user-action/${currentUser.uid}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+      })
+      .then(res => {
+        console.log(res.data);
+        goBack();
+        // if (currentIndex < matches.length - 1) {
+        //   setCurrentIndex(currentIndex + 1);
+        // }
+      })
+      .catch(err => {
+        console.error(
+          'Unable to save detail now. Please try again later',
+          err,
+          err.code,
+        );
+      });
+  };
+  const handleMatch = useCallback(async () => {
+    const idToken = await auth().currentUser.getIdToken();
+    // console.log(LikedUser);
+    await axios
+      .post(
+        `${urls.PROD_URL}/user-action/match`,
+        {
+          firebaseUid1: currentUser.uid,
+          firebaseUid2: user?.firebaseUid,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+        },
+      )
+      .then(res => {
+        // console.log(res.data);
+        // getLikedList();
+
+        navigate('Chat', {user: user});
+        // if (currentIndex < matches.length - 1) {
+        //   setCurrentIndex(currentIndex + 1);
+        // }
+      })
+      .catch(err => {
+        console.error(
+          'Unable to save detail now. Please try again later',
+          err?.response?.data,
+          err.code,
+        );
+      });
+  }, [user]);
   return (
     <FlexView>
+      <BackButtonIcon />
+
       <ScrollView>
         <ImageBackground
           source={ImgSrc.background2}
@@ -33,10 +142,13 @@ export const ProfileScreen = ({route}) => {
           style={styles.container}>
           <View style={styles.profileCard}>
             <View style={styles.shadow}>
-              <Text style={styles.name}>{user?.displayName}</Text>
+              <Text style={styles.name}>{user?.name}</Text>
 
               <View style={styles.imageshadow}>
-                <Image source={{uri: user?.image}} style={styles.image} />
+                <Image
+                  source={{uri: user?.profilePictures[0]}}
+                  style={styles.image}
+                />
               </View>
               {/* {user?.message && (
                 <AbsoluteView
@@ -52,12 +164,9 @@ export const ProfileScreen = ({route}) => {
 
           <View style={styles.cardShadow}>
             <View style={styles.card}>
-              <Text style={styles.likePrompt}>A random fact I love</Text>
+              <Text style={styles.likePrompt}>{Object.keys(prompts)[0]}</Text>
 
-              <Text style={styles.prompt}>
-                If you stood on Mars in normal clothes, your blood would start
-                to boil and you would die.
-              </Text>
+              <Text style={styles.prompt}>{Object.values(prompts)[0]}</Text>
               {/* {user?.message && (
                 <AbsoluteView
                   B={10}
@@ -71,14 +180,28 @@ export const ProfileScreen = ({route}) => {
           </View>
 
           <View style={styles.stripe}>
-            <AppText style={styles.text1}>19</AppText>
+            <AppText style={styles.text1}>
+              {getCurrentAgeFromTimestamp(user?.dateOfBirth)}
+            </AppText>
             <View style={styles.separator1} />
-            <AppText style={styles.text1}>Male</AppText>
+            <AppText style={styles.text1}>{user?.gender}</AppText>
             <View style={styles.separator1} />
             <PinIcon size={fontSizes.xsmall} />
-            <AppText style={styles.text1}>Hulimavu</AppText>
+            <AppText
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={[
+                styles.text1,
+                {
+                  flexWrap: 'wrap', // Ensures the text wraps to the next line if it exceeds the width
+
+                  width: 60,
+                },
+              ]}>
+              {user.location?.locality}
+            </AppText>
             <View style={styles.separator1} />
-            <AppText style={styles.text1}>5'7</AppText>
+            <AppText style={styles.text1}>{user?.height}</AppText>
           </View>
 
           <View
@@ -95,7 +218,7 @@ export const ProfileScreen = ({route}) => {
               },
             ]}>
             <Image
-              source={ImgSrc.profile1}
+              source={{uri: user?.profilePictures[1]}}
               style={[styles.image, {width: '100%', height: height * 0.4}]}
             />
             {/* {user?.message && (
@@ -107,22 +230,9 @@ export const ProfileScreen = ({route}) => {
 
           <View style={[styles.cardShadow]}>
             <View style={styles.card}>
-              <Text style={styles.likePrompt}>
-                A place I could live forever
-              </Text>
+              <Text style={styles.likePrompt}>{Object.keys(prompts)[1]}</Text>
 
-              <Text style={styles.prompt}>
-                This town called ‘Sardina’ in Italy!
-              </Text>
-              {/* {user?.message && (
-                <AbsoluteView
-                  B={10}
-                  R={10}
-                  BG={Colors.transparent}
-                  FullRowCenter>
-                  <LikeButtonIcon size={width * 0.16} />
-                </AbsoluteView>
-              )} */}
+              <Text style={styles.prompt}>{Object.values(prompts)[1]}</Text>
             </View>
           </View>
 
@@ -140,7 +250,7 @@ export const ProfileScreen = ({route}) => {
             ]}>
             <Image
               style={[styles.image, {width: '100%', height: height * 0.4}]}
-              source={ImgSrc.profile3}
+              source={{uri: user?.profilePictures[2]}}
             />
             {/* {user?.message && (
               <AbsoluteView B={10} R={10} BG={Colors.transparent} FullRowCenter>
@@ -151,11 +261,9 @@ export const ProfileScreen = ({route}) => {
 
           <View style={styles.cardShadow}>
             <View style={styles.card}>
-              <Text style={styles.likePrompt}>My biggest date fail</Text>
+              <Text style={styles.likePrompt}>{Object.keys(prompts)[2]}</Text>
 
-              <Text style={styles.prompt}>
-                Going to a restuarant and catching the girl’s dad spying on us
-              </Text>
+              <Text style={styles.prompt}>{Object.values(prompts)[2]}</Text>
               {/* {user?.message && (
                 <AbsoluteView
                   B={10}
@@ -180,7 +288,7 @@ export const ProfileScreen = ({route}) => {
               },
             ]}>
             <Image
-              source={ImgSrc.profile2}
+              source={{uri: user?.profilePictures[3]}}
               style={[styles.image, {width: '100%', height: height * 0.4}]}
             />
             {/* {user?.message && (
@@ -191,7 +299,7 @@ export const ProfileScreen = ({route}) => {
           </View>
         </ImageBackground>
 
-        <SwipeUnlock user={user} />
+        <SwipeUnlock user={user} onMatch={handleMatch} />
       </ScrollView>
     </FlexView>
   );

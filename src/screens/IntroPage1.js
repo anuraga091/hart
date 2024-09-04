@@ -22,7 +22,7 @@ const IntroPage1 = ({navigation}) => {
 
   const details = useSelector(state => state.basicDetails);
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();
@@ -44,11 +44,11 @@ const IntroPage1 = ({navigation}) => {
               altitude: altitude,
               accuracy: accuracy,
             };
-            console.log('location', location);
+            // console.log('location', location);
             console.log('user.uid', user.uid);
             axios
               .post(
-                `${urls.PROD_URL}/user/location`,
+                `${urls.PROD_URL}/user-action/location`,
                 {
                   firebaseUid: user.uid,
                   location: location,

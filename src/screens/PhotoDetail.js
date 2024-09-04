@@ -31,6 +31,7 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
 
   const [s3URLs, setS3URLs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [disabled, setdisabled] = useState(true);
 
   const openImagePicker = ind => {
     ImagePicker.openPicker({
@@ -48,7 +49,13 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
       //console.log(image.path);
     });
   };
-
+  useEffect(() => {
+    if (selectedImages.filter(i => i).length === 4) {
+      setdisabled(false);
+    } else {
+      setdisabled(true);
+    }
+  }, [selectedImages]);
   const handleBack = () => {
     //handle back
     // console.log('clicked photos', navigation.canGoBack())
@@ -277,7 +284,11 @@ const PhotoDetail = ({basic_detail, addBasicDetail, updateBasicDetail}) => {
         </>
       </View>
       <View style={styles.button}>
-        <ContinueButton onPress={uploadImagesAndContinue} />
+        <ContinueButton
+          isLoading={loading}
+          disabled={disabled}
+          onPress={uploadImagesAndContinue}
+        />
       </View>
 
       <Text style={styles.page}>2 of 4</Text>

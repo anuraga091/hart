@@ -60,6 +60,7 @@ const Details = ({navigation, addBasicDetail}) => {
   const [openPhotoRoute, setOpenPhotoRoute] = useState(false);
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
+  const [isDisabled, setisDisabled] = useState(false);
 
   //const gender = ['Male' , "Female", "Non-binary", "Genderqueer", "Genderfluid", "Agender", "Bigender", "Two-Spirit", "Androgynous", "Demiboy", "Demigirl", "Genderflux", "Neutrois", "Pangender", "Third Gender", "Transgender", "Cisgender", "Gender Nonconforming"]
   var heightArray = [];
@@ -95,6 +96,14 @@ const Details = ({navigation, addBasicDetail}) => {
   const onChangeName = e => {
     setName(e);
   };
+
+  useEffect(() => {
+    if (name && value1 && value2) {
+      setisDisabled(false);
+    } else {
+      setisDisabled(true);
+    }
+  }, [name, value1, value2]);
 
   const handleBack = () => {
     //handle logout
@@ -312,7 +321,7 @@ yourself to us`}</Text>
             />
           </View>
 
-          <ContinueButton onPress={onContinue} />
+          <ContinueButton disabled={isDisabled} onPress={onContinue} />
 
           <Text style={styles.page}>1 of 4</Text>
         </View>

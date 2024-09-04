@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   Animated,
   Dimensions,
@@ -15,6 +15,9 @@ import {useNavigation} from '@react-navigation/native';
 import {Fonts, height} from '../utils/styles/fontsSizes';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import {SlideArrowIcon} from '../utils/assetComp/IconComp';
+import axios from 'axios';
+import urls from '../utils/urls';
+import auth from '@react-native-firebase/auth';
 
 const {width} = Dimensions.get('window');
 const lockWidth = width * 0.9;
@@ -22,7 +25,8 @@ const lockHeight = Math.floor(width * 0.15);
 const smallgap = 6;
 const finalPosition = lockWidth - lockHeight;
 
-export default function SwipeUnlock({user}) {
+export default function SwipeUnlock({user, onMatch}) {
+  // console.log(user?.name);
   const pan = useRef(new Animated.ValueXY({x: 0, y: 0})).current;
   const navigation = useNavigation();
   const translateBtn = pan.x.interpolate({
@@ -64,6 +68,7 @@ export default function SwipeUnlock({user}) {
       bounciness: 0,
     }).start();
   };
+
   const unlock = () => {
     Animated.spring(pan, {
       toValue: {x: finalPosition, y: 0},
@@ -77,10 +82,10 @@ export default function SwipeUnlock({user}) {
       // });
       Vibration.vibrate(90);
       reset();
-
-      navigation.navigate('Chat', {user});
+      onMatch();
     }, 100);
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.lockContainer}>

@@ -6,24 +6,26 @@ import {useNavigation} from '@react-navigation/native';
 import {FONT_SIZES, Fonts} from '../../utils/styles/fontsSizes';
 import {firebase} from '@react-native-firebase/firestore';
 import Footer from '../../components/footer';
+import axios from 'axios';
+import urls from '../../utils/urls';
 export const ChatList = () => {
   const {reset, navigate} = useNavigation();
   const [users, setUsers] = useState([]);
   const currentUser = firebase.auth().currentUser;
-  useEffect(() => {
-    const unsubscribe = firebase
-      .firestore()
-      .collection('users')
-      .onSnapshot(querySnapshot => {
-        const usersList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setUsers(usersList.filter(user => user?.id !== currentUser.uid));
+  const getLikedList = () => {
+    axios
+      .get(`${urls.PROD_URL}/user-action/match/${currentUser.uid}`)
+      .then(response => {
+        // console.log('response', response.data);
+        setUsers(response.data);
+      })
+      .catch(error => {
+        console.log('error', error);
       });
-
-    return () => unsubscribe();
-  }, [currentUser.uid]);
+  };
+  useEffect(() => {
+    getLikedList();
+  }, []);
   const renderItem = ({item, index}) => (
     <TouchableOpacity
       key={index}
@@ -32,16 +34,20 @@ export const ChatList = () => {
         {borderBottomWidth: users.length === index + 1 ? 0 : 1},
       ]}
       onPress={() =>
-        navigate('LikedScreen', {
+        navigate('Chat', {
           isComments: item?.message ? true : false,
-          user: item,
+          user: item?.user,
         })
       }>
       <AppView disabled style={{flexDirection: 'row', alignItems: 'center'}}>
-        <AppImage source={{uri: item?.image}} BOR={50} SIZE={90} />
-        <AppView ML={20} ColumnCenterStart>
-          <Text style={styles.name}>{item?.displayName} Kendall</Text>
-          <Text style={styles.description}>{item?.message} hgg</Text>
+        <AppImage
+          source={{uri: item?.user?.profilePictures[0]}}
+          BOR={50}
+          SIZE={90}
+        />
+        <AppView disabled ML={20} ColumnCenterStart>
+          <Text style={styles.name}>{item?.user?.name}</Text>
+          {/* <Text style={styles.description}>{item?.message} hgg</Text> */}
         </AppView>
       </AppView>
     </TouchableOpacity>
@@ -53,7 +59,7 @@ export const ChatList = () => {
       <FlatList
         data={users}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item?._id}
         contentContainerStyle={styles.container}
       />
       <Footer index={3} />

@@ -18,6 +18,10 @@ import {AppView} from 'react-native-quick-components';
 import {height} from '../utils/styles/fontsSizes';
 import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/firestore';
+import {LikeButtonIcon} from '../utils/assetComp/IconComp';
+import {addBasicDetail} from '../redux/reducer/basicDetailsSlice';
+import messaging from '@react-native-firebase/messaging';
+import {getLocation} from '../utils/useLocation';
 
 const Homepage = ({data}) => {
   const [matches, setMatches] = useState([]); // State to store matches
@@ -27,22 +31,6 @@ const Homepage = ({data}) => {
   const [showUsers, setShowUsers] = useState([]);
   const [hideUsers, setHideUsers] = useState([]);
   const currentUser = firebase.auth().currentUser;
-
-  useEffect(() => {
-    const unsubscribe = firestore()
-      .collection('LikedUsers')
-      .doc(currentUser.uid)
-      .onSnapshot(documentSnapshot => {
-        // console.log('documentSnapshot.exists', documentSnapshot.exists);
-        if (documentSnapshot.exists) {
-          const data = documentSnapshot.data();
-          setShowUsers(data.Show || []);
-          setHideUsers(data.Hide || []);
-        }
-      });
-
-    return () => unsubscribe();
-  }, [currentUser.uid]);
 
   const handleMoveUser = () => {
     if (hideUsers.length > 0 && showUsers.length < 25) {
@@ -64,32 +52,36 @@ const Homepage = ({data}) => {
     }
   }, [isAuthenticated, hasCompletedOnboarding, navigation]);
 
-  useEffect(() => {
+  const getMatchesList = async () => {
+    const idToken = await auth().currentUser.getIdToken();
+    // console.log(idToken);
+    // console.log(userId);
     const userId = data.basicDetails?.firebaseUid;
-    (async () => {
-      const idToken = await auth().currentUser.getIdToken();
-      // console.log(idToken);
-      // console.log(userId);
-      axios
-        .get(`${urls.PROD_URL}/matches/${userId}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${idToken}`,
-          },
-        })
-        .then(res => {
-          // console.log(res.data);
-          console.log(res.data.matches);
-          const matches = res.data.matches;
-          setMatches(res.data.matches);
-        })
-        .catch(err => {
-          console.log(
-            'Unable to save detail now. Please try again later',
-            err.response.data,
-          );
-        });
-    })();
+
+    axios
+      .get(`${urls.PROD_URL}/matches/${userId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+      })
+      .then(res => {
+        // console.log(res.data);
+        // console.log(res.data.matches);
+        const matches = res.data.matches;
+        setMatches(res.data.matches);
+      })
+      .catch(err => {
+        console.log(
+          'Unable to save detail now. Please try again later',
+          err.response.data,
+        );
+      });
+  };
+
+  useEffect(() => {
+    getMatchesList();
+    updateFCMtoken();
   }, []);
 
   const handleAction = async (action, targetFirebaseUid, prompts, reply) => {
@@ -113,10 +105,12 @@ const Homepage = ({data}) => {
         },
       )
       .then(res => {
-        console.log(res.data);
-        if (currentIndex < matches.length - 1) {
-          setCurrentIndex(currentIndex + 1);
-        }
+        getMatchesList();
+
+        // console.log(res.data);
+        // if (currentIndex < matches.length - 1) {
+        //   setCurrentIndex(currentIndex + 1);
+        // }
       })
       .catch(err => {
         console.error(
@@ -127,8 +121,59 @@ const Homepage = ({data}) => {
       });
   };
 
-  const handleRemove = () => {
-    console.log('handle remove clicked');
+  const updateFCMtoken = async () => {
+    const idToken = await auth().currentUser.getIdToken();
+    const id = auth().currentUser.uid;
+    const authStatus = await messaging().requestPermission();
+
+    // Register the device for remote messages
+    // await messaging().registerDeviceForRemoteMessages();
+
+    // Get the FCM token
+    const token = await messaging().getToken();
+    getLocation(position => {
+      const lat = position.coords.latitude;
+      const long = position.coords.longitude;
+
+      const location = {
+        lat: lat,
+        long: long,
+      };
+      axios
+        .post(
+          `${urls.PROD_URL}/user`,
+          {
+            firebaseUid: id,
+            phone: data.basicDetails.phone,
+
+            fcmToken: token,
+            location: location,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${idToken}`,
+            },
+          },
+        )
+        .then(res => {
+          addBasicDetail({
+            preferences: {
+              fcmToken: token,
+            },
+          });
+          // setLoading(false);
+        })
+        .catch(err => {
+          console.error(
+            'Unable to save detail now. Please try again later',
+            err?.response?.data,
+            err.code,
+          );
+          // setLoading(false);
+        });
+      // console.log('location', location);
+    });
   };
 
   return (
@@ -216,8 +261,7 @@ const Homepage = ({data}) => {
                 resizeMode="cover"
                 source={require('../../assets/location-pin.png')}
               />
-              <Text style={styles.locationText}>
-                {' '}
+              <Text numberOfLines={2} style={styles.locationText}>
                 {matches[currentIndex].location?.locality}
               </Text>
             </View>
@@ -280,6 +324,7 @@ const Homepage = ({data}) => {
                     Object.values(matches[currentIndex].prompts)[2],
                 })
               }>
+              {/* <LikeButtonIcon size={70} /> */}
               <Image
                 style={styles.likebtn}
                 resizeMode="cover"
@@ -446,6 +491,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Raleway-SemiBold',
     fontSize: 17,
     marginRight: 5,
+    flexWrap: 'wrap', // Ensures the text wraps to the next line if it exceeds the width
+
+    width: 55,
   },
   imgView: {
     borderRadius: 12,

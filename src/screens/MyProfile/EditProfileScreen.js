@@ -47,7 +47,7 @@ export const EditProfileScreen = () => {
   }, [profile?.prompt]);
 
   const filterToList = () => {
-    const data = profile?.prompt;
+    const data = profile?.prompt ?? profile?.prompts;
     const result = [];
 
     for (const section in data) {
@@ -130,7 +130,7 @@ export const EditProfileScreen = () => {
           <AppView RowSpacBtw>
             <View>
               <Text style={styles.detailTitle}>Gender</Text>
-              <Text style={styles.detailText}>Male</Text>
+              <Text style={styles.detailText}>{profile?.gender}</Text>
             </View>
             <RightarrowIcon />
           </AppView>
@@ -141,7 +141,7 @@ export const EditProfileScreen = () => {
           <AppView RowSpacBtw>
             <View>
               <Text style={styles.detailTitle}>Height</Text>
-              <Text style={styles.detailText}>5'7"</Text>
+              <Text style={styles.detailText}>{profile?.height}</Text>
             </View>
             <RightarrowIcon />
           </AppView>
