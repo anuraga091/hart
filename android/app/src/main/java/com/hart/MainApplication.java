@@ -1,4 +1,4 @@
-package com.realate;
+package com.realateapp;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

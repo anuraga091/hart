@@ -26,7 +26,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.realate</string>
+			<string>com.realateapp</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>app-1-808180923750-ios-bd89f511c4684c50715ca7</string>

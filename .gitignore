@@ -65,3 +65,6 @@ yarn-error.log
 
 # testing
 /coverage
+# Ignore Google Service Info plist for iOS
+ios/GoogleService-Info.plist
+android/app/google-services.json
